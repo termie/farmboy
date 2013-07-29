@@ -21,6 +21,18 @@ Vagrant::Config.run do |config|
     end
   end
 
+  # Where Jenkins will live
+  config.vm.define :proxy do |vcs_config|
+    vcs_config.vm.box = "raring64"
+    vcs_config.vm.box_url = "http://cloud-images.ubuntu.com/raring/current/raring-server-cloudimg-vagrant-amd64-disk1.box"
+    vcs_config.vm.network :hostonly, "192.168.33.12"
+
+    db_config.vm.provider :virtualbox do |vb|
+      # Use VBoxManage to customize the VM. For example to change memory:
+      vb.customize ["modifyvm", :id, "--memory", "1024"]
+    end
+  end
+
   #config.vm.define :db do |db_config|
   #  db_config.vm.box = "raring64"
   #  db_config.vm.box_url = "http://cloud-images.ubuntu.com/raring/current/raring-server-cloudimg-vagrant-amd64-disk1.box"
