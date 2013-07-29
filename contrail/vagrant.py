@@ -7,6 +7,7 @@ from fabric.api import task
 
 DEFAULT_ROLEDEFS = {
     'proxy': ['vagrant@192.168.33.10'],
+    'vcs': ['vagrant@192.168.33.11'],
     'web': ['vagrant@192.168.33.100',
             'vagrant@192.168.33.101'],
     'tomcat': ['vagrant@192.168.33.100',

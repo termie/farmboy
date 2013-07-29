@@ -1,0 +1,2 @@
+CREATE USER gitlab WITH PASSWORD 'letmein';
+CREATE DATABASE gitlabhq_production OWNER gitlab;
