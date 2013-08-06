@@ -15,6 +15,8 @@ DEFAULT_USER='contrail'
 def _set_env_defaults():
     env.setdefault('contrail_user', DEFAULT_USER)
     env.setdefault('contrail_files', './files')
+    env['skip_bad_hosts'] = True
+    env['timeout'] = 2
 
 
 _set_env_defaults()
