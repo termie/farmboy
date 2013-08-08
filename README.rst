@@ -88,8 +88,8 @@ Configuration
 [TODO]
 
 
-Design
-------
+Design Goals
+------------
 
 Contrail is designed for developers and as such it aims to put the control
 of everything in your hands. We try to use sensible defaults but we also
@@ -98,7 +98,7 @@ of your particular project.
 
 
 ---------------------
-1. We Expose The Guts
+1. Expose The Guts
 ---------------------
 
 You're a smart person, we let you be smart.
@@ -121,3 +121,19 @@ tasks. We just wrote a bunch of helpful tasks that interact well with each
 other. If you want to write your own helpful tasks, just import them in the
 fabfile.
 
+
+----------
+2. Be Real
+----------
+
+Stop making fake systems that look nothing like your production environment.
+
+We want to codify best practices around these projects and make them easy
+to use. In some cases this is a lofty goal, but at the very least we are
+encouraging repeatability which is the first step to comparing usefulness
+of an idea over time.
+
+Sometimes being real is a pain, it would be much nicer to live in a world
+where there were no race conditions and services never failed, but we don't.
+Contrail should give you the tools to think in real terms and deal with real
+problems.
