@@ -91,5 +91,4 @@ frontend http-in
   default_backend web_servers
 
 backend web_servers
-  server web0 192.168.33.100:80 maxconn 32
-  server web1 192.168.33.101:80 maxconn 32
+%(servers)s

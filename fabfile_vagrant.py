@@ -20,7 +20,7 @@ from fabric.api import task
 
 
 # Private key that we'll use to connect to the machines
-env.key_filename = os.path.expanduser('~/.vagrant/insecure_private_key')
+env.key_filename = os.path.expanduser('~/.vagrant.d/insecure_private_key')
 
 # Since we're be using apt caching, point out where that proxy will live.
 # POWER TIP: If you're already using such a proxy, you can just point this

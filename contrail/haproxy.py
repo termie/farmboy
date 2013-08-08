@@ -4,8 +4,12 @@ import fabtools.require
 from contrail import util
 
 
+from fabric.api import env
 from fabric.api import roles
 from fabric.api import task
+
+
+WEB_SERVER = '  server web%(i)s %(host)s:%(port)s maxconn 32'
 
 
 @roles('proxy')
@@ -16,8 +20,16 @@ def deploy():
         'haproxy'
     ])
 
-    fabtools.require.files.file(
-        source   = util.files('haproxy/haproxy.base'),
+    servers = []
+    for i, server in enumerate(env.roledefs['web']):
+        server_s = WEB_SERVER % {'i': i,
+                                 'host': server.split('@')[-1],
+                                 'port': '80'}
+        servers.append(server_s)
+
+    fabtools.require.files.template_file(
+        template_source   = util.files('haproxy/haproxy.base'),
+        context  = {'servers': '\n'.join(servers)},
         path     = '/etc/haproxy/haproxy.cfg',
         owner    = 'root',
         group    = 'root',
