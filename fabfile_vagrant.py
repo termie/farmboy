@@ -32,12 +32,12 @@ env.contrail_apt_proxy = 'http://192.168.33.13:3142'
 #            the servers in some more dynamic way.
 # POWER TIP: You might also want to separate these out into a yaml file
 #            and do `env.roledefs = yaml.load(open('contrail.yaml'))`
-env.roledefs = {
+env.roledefs.update({
         'apt': ['vagrant@192.168.33.13'],
         'proxy': ['vagrant@192.168.33.10'],
         'web': ['vagrant@192.168.33.100',
                 'vagrant@192.168.33.101']
-        }
+        })
 
 # Where our django app lives (this directory will be pushed to web servers).
 # POWER TIP: We expect this to be in the current directory by default

@@ -14,8 +14,7 @@ from fabric.api import task
 
 
 def _set_env_defaults():
-    env.setdefault('contrail_apt_host', '192.168.11.13')
-    env.setdefault('contrail_apt_port', '3142')
+    env.setdefault('contrail_apt_proxy', 'http://192.168.33.13:3142')
 
 
 _set_env_defaults()
@@ -50,10 +49,13 @@ def deploy():
 @roles('ci', 'proxy', 'vcs', 'web')
 @task
 @parallel
-def set_proxy():
-    # TODO(termie): template this with host and port above
-    fabtools.require.files.file(
-        source   = util.files('apt-cacher/01apt-cacher'),
+def set_proxy(proxy=None):
+    if proxy is None:
+        proxy = env.contrail_apt_proxy
+
+    fabtools.require.files.template_file(
+        template_source   = util.files('apt-cacher/01apt-cacher'),
+        context  = {'proxy': proxy},
         path     = '/etc/apt/apt.conf.d/01apt-cacher',
         owner    = 'root',
         group    = 'root',
