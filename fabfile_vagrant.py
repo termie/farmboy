@@ -47,7 +47,6 @@ env.roledefs.update({
 #            env variable.
 env.contrail_django_app = 'demo'
 
-
 # Where to find the template files to use when configuring services.
 # POWER TIP: We'll fall back to the defaults shipped with contrail for
 #            any files not found in this location.

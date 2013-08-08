@@ -75,13 +75,49 @@ section below.
 
 Now, let's get you rollin::
 
-  contrail deploy all
+  fab demo
 
 
 [TODO]
+
 
 
 Configuration
 -------------
 
 [TODO]
+
+
+Design
+------
+
+Contrail is designed for developers and as such it aims to put the control
+of everything in your hands. We try to use sensible defaults but we also
+expect you to be a power user and want to tweak everything to fit the needs
+of your particular project.
+
+
+---------------------
+1. We Expose The Guts
+---------------------
+
+You're a smart person, we let you be smart.
+
+In most cases Contrail is just a couple helpers for building fabfiles, the
+definition documents that Fabric uses to run commands on remote servers. If
+you already know Fabric (a well-known and powerful tool) you will have
+a very easy time making modifications. If you don't already know it, there
+is plenty of good documentation.
+
+Contrail tries to explain and demonstrate the features of Fabric that it uses
+in the fabfile is generates for you with hopes that you will be able to take
+it from there.
+
+The config file for Contrail is just the fabfile. And fabfiles are just
+python. Go nuts.
+
+After your initial setup you'll be using the `fab` command to execute your
+tasks. We just wrote a bunch of helpful tasks that interact well with each
+other. If you want to write your own helpful tasks, just import them in the
+fabfile.
+
