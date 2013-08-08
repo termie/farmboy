@@ -61,8 +61,8 @@ servers to test your new code. At the moment that involves Gunicorn with a WSGI
 app [TODO] or Django, or Tomcat with tomcat apps [TODO].
 
 
-Usage
------
+Usage [TODO]
+------------
 
 Build a skeleton config for a development environment, in this case
 using Vagrant::
