@@ -75,6 +75,7 @@ section below.
 
 Now, let's get you rollin::
 
+  vagrant up
   fab demo
 
 
