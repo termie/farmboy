@@ -50,7 +50,7 @@ of separate servers and services that all need to be managed in unison to
 test changes.
 
 Contrail suggests starting with a pretty standard-looking setup of having an
-HAProxy server that backends to a multiple Nginx servers that in turn backend
+HAProxy server that backends to multiple Nginx servers that in turn backend
 to your app servers that backend to a single database [TODO]. This forces you to
 consider (and allows you to check) the implications of multiple app servers,
 concurrency and caching.
@@ -69,9 +69,13 @@ using Vagrant::
 
   contrail startdev --vagrant
 
-At this point we should have a ``Vagrantfile`` and a ``fabfile.py`` in our
-current directory.
+At this point we should have a ``Vagrantfile`` and a ``fabfile.py``, and
+in our current directory. We'll get to to those in the Configuration
+section below.
 
+Now, let's get you rollin::
+
+  contrail deploy all
 
 
 [TODO]

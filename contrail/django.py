@@ -20,8 +20,11 @@ from contrail import gunicorn
 
 @roles('web')
 @task
-def deploy(path='./demo'):
+def deploy(path=None, use_gunicorn=True):
     """Put a django site onto the web servers."""
+    if path is None:
+        path = env.contrail_django_app
+
     fabtools.require.python.package('django', use_sudo=True)
 
     project = os.path.basename(path)
@@ -40,13 +43,14 @@ def deploy(path='./demo'):
                                              env.contrail_user,
                                              project))
 
-    fabtools.require.files.template_file(
-        template_source = util.files('gunicorn/django'),
-        path     = '/etc/gunicorn.d/django',
-        context  = {'project': project},
-        owner    = 'root',
-        group    = 'root',
-        mode     = '644',
-        use_sudo = True)
+    if use_gunicorn:
+        fabtools.require.files.template_file(
+            template_source = util.files('gunicorn/django'),
+            path     = '/etc/gunicorn.d/django',
+            context  = {'project': project},
+            owner    = 'root',
+            group    = 'root',
+            mode     = '644',
+            use_sudo = True)
 
-    gunicorn.restart()
+        gunicorn.restart()
