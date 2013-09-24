@@ -88,6 +88,62 @@ Configuration
 
 [TODO]
 
+The cloud is a funny place. We're all pretty comfortable launching a virtual
+machine at this point, but network configs are still a bit of a wild west.
+
+Instead of trying to prescribe your network setups, Contrail gives you a
+gracefully degrading set of tools to help you along your way for whatever
+level of control over the network you may have.
+
+------------
+Full Control
+------------
+
+When you are using something like Vagrant for local VMs it is easy to assign
+specific IPs that never have to change to your VMs. In these cases you can
+accept the default configuration templates provided by Contrail.
+
+<see fabfile_vagrant.py>
+
+The code is just templated, so should you want to make any changes, go ahead
+and modify it to meet your requirements.
+
+
+--------------
+API Inspection
+--------------
+
+For plenty of public clouds running OpenStack or AWS compatible interfaces,
+you'll likely want to launch the instances and then query the API for the
+IPs you'll be using to interact with them.
+
+For these situations Contrail gives you a few templates for launching
+instances in different environments that you can modify with your details,
+and a tool to query your instances and cache the IP configuration locally.
+
+<see build_aws.py>
+
+
+--------------
+Dynamic Lookup
+--------------
+
+You've got something crazy going on at your company and need to look up your
+IPs from a custom database? You can define your hosts as a callable that will
+be run every time you need to get the IPs for your setup. (We'd suggest caching
+it locally, however, and using the caching wrapper Contrail provides)
+
+
+---------
+Hardcoded
+---------
+
+If you've got a specific setup, but no easy API access or one that is not
+supported (yet?) by any of the predefined Contrail templates, you can simply
+hardcode your IPs in the fabfile. Contrail understands that sometimes
+hardcoding some config is simpler and faster than writing a dynamic lookup.
+
+
 
 Design Goals
 ------------
