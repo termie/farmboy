@@ -1,5 +1,10 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
+# This is a templated file generated from files/contrail/fabfile.py,
+# commands such as `contrail vagrant.init` will produce an output
+# version in your local directory that you can then modify to your
+# heart's content.
+
 import os
 
 from contrail import aptcacher
