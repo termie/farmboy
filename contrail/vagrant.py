@@ -1,5 +1,9 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
+#import shutil
+
+from contrail import util
+
 from fabric.api import env
 from fabric.api import local
 from fabric.api import task
@@ -14,6 +18,16 @@ DEFAULT_ROLEDEFS = {
             'vagrant@192.168.33.101'],
     'tomcat': ['vagrant@192.168.33.100',
                'vagrant@192.168.33.101']}
+
+
+@task
+def init():
+    """Copy vagrant-specific template to local directory."""
+    vagrantfile = util.files('vagrant/Vagrantfile')
+
+    # TODO(termie): local cp or shutil?
+    local('cp %s %s' % (vagrantfile, './Vagrantfile'))
+    #shutil.copy(vagrantfile, './Vagrantfile')
 
 
 @task

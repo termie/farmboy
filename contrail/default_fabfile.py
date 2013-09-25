@@ -11,6 +11,7 @@ from contrail import haproxy
 from contrail import jenkins
 from contrail import nginx
 from contrail import tomcat
+from contrail import util
 from contrail import vagrant
 
 
@@ -32,6 +33,7 @@ env.contrail_apt_proxy = 'http://192.168.33.13:3142'
 #            the servers in some more dynamic way.
 # POWER TIP: You might also want to separate these out into a yaml file
 #            and do `env.roledefs = yaml.load(open('contrail.yaml'))`
+#            or use the helper `env.roledefs = util.load_roledefs()`
 env.roledefs.update({
         'apt': ['vagrant@192.168.33.13'],
         'proxy': ['vagrant@192.168.33.10'],
@@ -55,12 +57,3 @@ env.contrail_django_app = 'demo'
 env.contrail_files = './files'
 
 
-@task(default=True)
-def demo():
-    execute(aptcacher.deploy)
-    execute(aptcacher.set_proxy)
-    execute(core.install_user)
-    execute(haproxy.deploy)
-    execute(nginx.deploy)
-    execute(gunicorn.deploy)
-    execute(django.deploy, path=env.contrail_django_app)
