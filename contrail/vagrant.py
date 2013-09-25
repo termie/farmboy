@@ -28,6 +28,10 @@ def init():
     # TODO(termie): local cp or shutil?
     local('cp %s %s' % (vagrantfile, './Vagrantfile'))
     #shutil.copy(vagrantfile, './Vagrantfile')
+    fabfile_context = {'apt_proxy': repr('http://192.168.33.13:3142'),
+                       'roledefs': repr(DEFAULT_ROLEDEFS),
+                       }
+    util.template_file('contrail/fabfile.py', 'fabfile.py', fabfile_context)
 
 
 @task

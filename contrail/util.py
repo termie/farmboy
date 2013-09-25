@@ -21,3 +21,12 @@ def load_roledefs(path='contrail.yaml'):
     """
     doc = yaml.load(open(path))
     return doc.get('roledefs', doc)
+
+
+def template_file(source, target, context=None):
+    context = context and context or {}
+    if not os.path.exists(source):
+        source = files(source)
+
+    template = open(source).read()
+    open(target, 'w').write(template % context)
