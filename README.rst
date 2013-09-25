@@ -61,13 +61,13 @@ servers to test your new code. At the moment that involves Gunicorn with a WSGI
 app [TODO] or Django, or Tomcat with tomcat apps [TODO].
 
 
-Usage [TODO]
-------------
+Quickstart
+----------
 
 Build a skeleton config for a development environment, in this case
 using Vagrant::
 
-  contrail startdev --vagrant
+  contrail vagrant.init
 
 At this point we should have a ``Vagrantfile`` and a ``fabfile.py``, and
 in our current directory. We'll get to to those in the Configuration
@@ -76,17 +76,44 @@ section below.
 Now, let's get you rollin::
 
   vagrant up
-  fab demo
+  contrail demo
 
 
-[TODO]
+
+Usage
+-----
+
+The `contrail` command is basically a wrapper around `fab`. You can use
+all the same options as one does with `fab`, we just add the various
+contrail additions by default.
+
+That said, there are some specific Contrail features that you are likely to
+use when getting started::
+
+  contrail vagrant.init   # create an example vagrant environment in the
+                          # current directory
+
+  contrail files.init     # make a local copy of the various config file
+                          # templates that contrail uses so that you can
+                          # override specific ones to work with your project
+
+  contrail openstack.init # [TODO] like vagrant.init but for OpenStack
+
+  contrail aws.init       # [TODO] like vagrant.init but for AWS
 
 
 
 Configuration
 -------------
 
-[TODO]
+We've tried to be exceptionally verbose in the example fabfiles we provide
+you with, so take a look in there after you do a contrail <something>.init
+or just take a look at files/contrail/fabfile.py
+
+
+
+Hosts / Roledefs / Network Config
+--------------------------------
 
 The cloud is a funny place. We're all pretty comfortable launching a virtual
 machine at this point, but network configs are still a bit of a wild west.
@@ -173,7 +200,7 @@ it from there.
 The config file for Contrail is just the fabfile. And fabfiles are just
 python. Go nuts.
 
-After your initial setup you'll be using the `fab` command to execute your
+After your initial setup you'll be using a regular fabfile to execute your
 tasks. We just wrote a bunch of helpful tasks that interact well with each
 other. If you want to write your own helpful tasks, just import them in the
 fabfile.

@@ -52,3 +52,12 @@ env.contrail_django_app = 'demo'
 env.contrail_files = './files'
 
 
+@task(default=True)
+def demo():
+    execute(aptcacher.deploy)
+    execute(aptcacher.set_proxy)
+    execute(core.install_user)
+    execute(haproxy.deploy)
+    execute(nginx.deploy)
+    execute(gunicorn.deploy)
+    execute(django.deploy, path=env.contrail_django_app)
