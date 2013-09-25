@@ -6,7 +6,17 @@ import yaml
 
 
 def files(s):
-    return os.path.join(env.get('contrail_files'), s)
+    """Return file path to a file in shared files path or locally defined.
+
+    Check whether the file exists in the defined path otherwise
+    fallback to the one shipped with Contrail.
+    """
+    path = os.path.join(env.get('contrail_files'), s)
+    if os.path.exists(path):
+        return path
+
+    # TODO(termie): use pkg_resources or whatnot to get the path to the
+    #               files we installed with the package
 
 
 def home(s):

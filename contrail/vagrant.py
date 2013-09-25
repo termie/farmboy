@@ -32,11 +32,3 @@ def init():
                        'roledefs': repr(DEFAULT_ROLEDEFS),
                        }
     util.template_file('contrail/fabfile.py', 'fabfile.py', fabfile_context)
-
-
-@task
-def defaults():
-    env.roledefs = DEFAULT_ROLEDEFS
-    result = local('vagrant ssh-config proxy | grep IdentityFile',
-                   capture=True)
-    env.key_filename = result.split()[1].strip('"')

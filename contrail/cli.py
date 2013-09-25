@@ -4,8 +4,6 @@ import sys
 from fabric import main as fab
 
 
-
-
 def main():
     """Load our default fabfile, then attempt to load any local fabfiles."""
     our_fab = os.path.join(os.path.dirname(__file__), 'default_fabfile.py')
