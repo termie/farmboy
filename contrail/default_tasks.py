@@ -3,6 +3,7 @@
 import os
 
 from contrail import aptcacher
+from contrail import aws
 from contrail import core
 from contrail import django
 from contrail import gitlab
