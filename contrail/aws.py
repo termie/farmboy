@@ -14,6 +14,7 @@ env.contrail_aws_region = 'us-west-2'
 env.contrail_aws_security_group = 'contrail'
 env.contrail_aws_key_pair = 'contrail'
 env.contrail_aws_image_id = 'ami-1e0c902e' #us-west-2 raring amd64
+env.contrail_aws_image_user = 'ubuntu'
 
 
 DEFAULT_ROLEDEF_FILE = 'contrail.aws.yaml'
@@ -36,6 +37,7 @@ env.contrail_aws_instances = ['proxy', 'apt', 'web', 'web']
 # env.contrail_aws_security_group = %(security_group)s
 # env.contrail_aws_key_pair = %(key_pair)s
 # env.contrail_aws_image_id = %(image_id)s  # us-west-2 raring amd64
+# env.contrail_aws_image_user = %(image_user)s
 
 # We're using `boto` for the built-in EC2 tools, so if you use those
 # you should define the common AWS environment variables in your shell:
@@ -46,7 +48,8 @@ env.contrail_aws_instances = ['proxy', 'apt', 'web', 'web']
 """ % {'region': repr(env.contrail_aws_region),
        'security_group': repr(env.contrail_aws_security_group),
        'key_pair': repr(env.contrail_aws_key_pair),
-       'image_id': repr(env.contrail_aws_image_id)}
+       'image_id': repr(env.contrail_aws_image_id),
+       'image_user': repr(env.contrail_aws_image_user)}
 
 
 @task
@@ -139,12 +142,12 @@ def refresh():
   for inst in running_instances:
     role = str(inst.tags['contrail'])
     role_l = o['roledefs'].get(role, [])
-    role_l.append(str('ubuntu@%s' % inst.ip_address))
+    role_l.append(str('%s@%s' % (env.contrail_aws_image_user, inst.ip_address)))
 
     o['roledefs'][role] = role_l
 
   yaml.dump(o,
-            stream=open('contrail.aws.yaml', 'w'),
+            stream=open(DEFAULT_ROLEDEF_FILE, 'w'),
             default_flow_style=False,
             indent=2,
             width=72)
