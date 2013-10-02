@@ -56,7 +56,7 @@ env.contrail_aws_instances = ['proxy', 'apt', 'web', 'web']
 @task
 def init():
   fabfile_context = {'roledefs': DEFAULT_ROLEDEFS,
-                     'keyfile': repr('%s.yaml' % env.contrail_aws_key_pair),
+                     'keyfile': repr('%s.pem' % env.contrail_aws_key_pair),
                      'preamble': DEFAULT_PREAMBLE}
   util.template_file('contrail/fabfile.py', 'fabfile.py', fabfile_context)
 
@@ -92,7 +92,12 @@ def build():
              dict(ip_protocol='udp',
                   from_port='60000',
                   to_port='61000',
+                  cidr_ip='0.0.0.0/0'),
+             dict(ip_protocol='tcp',
+                  from_port='3142',
+                  to_port='3142',
                   cidr_ip='0.0.0.0/0')]
+
     for rule in rules:
       util.puts('[aws]   adding rule: %(ip_protocol)s:%(from_port)s-%(to_port)s'
                 ' (%(cidr_ip)s)' % rule)
@@ -154,7 +159,7 @@ def refresh(expected=None):
   """Query AWS and dump the IPs we care about to a yaml file."""
   conn = ec2.connect_to_region(env.contrail_aws_region)
 
-  max_tries = 10
+  max_tries = 15
   for i in range(max_tries):
     util.puts('[aws] Fetching running and pending instances')
     running_instances = conn.get_only_instances(
@@ -176,9 +181,8 @@ def refresh(expected=None):
 
     time.sleep(5)
 
-  if not running_instances:
-    raise Exception('No running instances found,'
-                    ' perhaps you should launch some.')
+  if not running_instances or (expected and len(running_instances) != expected):
+    raise Exception('Did not find enough running instances.')
 
 
   o = {'roledefs': {}}

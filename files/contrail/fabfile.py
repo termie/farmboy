@@ -73,3 +73,6 @@ def demo():
     execute(nginx.deploy)
     execute(gunicorn.deploy)
     execute(django.deploy, path=env.contrail_django_app)
+
+    print ('Alright! Check out your site at: http://%%s'
+            %% util.host(env.roledefs['proxy'][0]))
