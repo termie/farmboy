@@ -37,3 +37,8 @@ def init():
                        'preamble': '',
                        }
     util.template_file('contrail/fabfile.py', 'fabfile.py', fabfile_context)
+
+
+@task
+def build():
+    local('vagrant up')

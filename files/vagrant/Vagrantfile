@@ -10,28 +10,28 @@ Vagrant.configure("2") do |config|
   end
 
   # Where Gitlab will live
-  config.vm.define :vcs do |vcs_config|
-    vcs_config.vm.box = "raring64"
-    vcs_config.vm.box_url = "http://cloud-images.ubuntu.com/raring/current/raring-server-cloudimg-vagrant-amd64-disk1.box"
-    vcs_config.vm.network :private_network, ip: "192.168.33.11"
+  #config.vm.define :vcs do |vcs_config|
+  #  vcs_config.vm.box = "raring64"
+  #  vcs_config.vm.box_url = "http://cloud-images.ubuntu.com/raring/current/raring-server-cloudimg-vagrant-amd64-disk1.box"
+  #  vcs_config.vm.network :private_network, ip: "192.168.33.11"
 
-    vcs_config.vm.provider "virtualbox" do |vb|
-      # Use VBoxManage to customize the VM. For example to change memory:
-      vb.customize ["modifyvm", :id, "--memory", "1024"]
-    end
-  end
+  #  vcs_config.vm.provider "virtualbox" do |vb|
+  #    # Use VBoxManage to customize the VM. For example to change memory:
+  #    vb.customize ["modifyvm", :id, "--memory", "1024"]
+  #  end
+  #end
 
   # Where Jenkins will live
-  config.vm.define :ci do |ci_config|
-    ci_config.vm.box = "raring64"
-    ci_config.vm.box_url = "http://cloud-images.ubuntu.com/raring/current/raring-server-cloudimg-vagrant-amd64-disk1.box"
-    ci_config.vm.network :private_network, ip: "192.168.33.12"
+  #config.vm.define :ci do |ci_config|
+  #  ci_config.vm.box = "raring64"
+  #  ci_config.vm.box_url = "http://cloud-images.ubuntu.com/raring/current/raring-server-cloudimg-vagrant-amd64-disk1.box"
+  #  ci_config.vm.network :private_network, ip: "192.168.33.12"
 
-    ci_config.vm.provider "virtualbox" do |vb|
-      # Use VBoxManage to customize the VM. For example to change memory:
-      vb.customize ["modifyvm", :id, "--memory", "1024"]
-    end
-  end
+  #  ci_config.vm.provider "virtualbox" do |vb|
+  #    # Use VBoxManage to customize the VM. For example to change memory:
+  #    vb.customize ["modifyvm", :id, "--memory", "1024"]
+  #  end
+  #end
 
   # Where Apt-Cacher or Apt-Mirror will live
   config.vm.define :apt do |apt_config|
