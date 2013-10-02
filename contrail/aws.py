@@ -1,3 +1,4 @@
+import time
 
 import boto.exception
 from boto import ec2
@@ -107,16 +108,7 @@ def build():
     key_pair = conn.create_key_pair(env.contrail_aws_key_pair)
     key_pair.save('./')
 
-  # check for instances
-  running_instances = conn.get_only_instances(
-      filters={'tag-key': 'contrail',
-               'instance-state-name': 'running'})
-
-  # TODO(termie): we _probably_ want to just terminate them all and start
-  #               new ones, is there a use case for keeping them?
-  for instance in running_instances:
-    util.puts('[aws] Terminating running instance: %s' % instance.instance_id)
-    instance.terminate()
+  execute(terminate)
 
   machines = env.contrail_aws_instances
 
@@ -134,22 +126,60 @@ def build():
   # tag the instances with their roles
   for machine in machines:
     inst = new_instances.pop()
-    util.puts('[aws]  assigning role: %s -> %s' % (inst.instance_id, machine))
+    util.puts('[aws]   assigning role: %s -> %s' % (inst.id, machine))
     inst.add_tag('contrail', machine)
 
-  execute(refresh)
+  execute(refresh, expected=len(machines))
 
 
 @task
-def refresh():
-  """Query AWS and dump the IPs we care about to a yaml file."""
+def terminate():
   conn = ec2.connect_to_region(env.contrail_aws_region)
-
-  util.puts('[aws] Fetching running and pending instances')
+  # check for instances
   running_instances = conn.get_only_instances(
       filters={'tag-key': 'contrail',
                'instance-state-name': 'pending',
                'instance-state-name': 'running'})
+
+  # TODO(termie): we _probably_ want to just terminate them all and start
+  #               new ones, is there a use case for keeping them?
+  for instance in running_instances:
+    util.puts('[aws] Terminating running instance: %s (%s)'
+              % (instance.id, instance.tags['contrail']))
+    instance.terminate()
+
+
+@task
+def refresh(expected=None):
+  """Query AWS and dump the IPs we care about to a yaml file."""
+  conn = ec2.connect_to_region(env.contrail_aws_region)
+
+  max_tries = 10
+  for i in range(max_tries):
+    util.puts('[aws] Fetching running and pending instances')
+    running_instances = conn.get_only_instances(
+        filters={'tag-key': 'contrail',
+                 'instance-state-name': 'pending',
+                 'instance-state-name': 'running'})
+
+    if not expected:
+      if running_instances:
+        break
+      util.puts('[aws]   nothing found, retrying in 5 seconds (%d of %d)'
+                % (i, max_tries))
+    else:
+      if running_instances and len(running_instances) == expected:
+        break
+      util.puts('[aws]   found %d, expecting %d, retrying in 5 seconds'
+                ' (%d of %d)'
+                % (len(running_instances), expected, i, max_tries))
+
+    time.sleep(5)
+
+  if not running_instances:
+    raise Exception('No running instances found,'
+                    ' perhaps you should launch some.')
+
 
   o = {'roledefs': {}}
   for inst in running_instances:
