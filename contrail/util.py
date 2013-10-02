@@ -1,9 +1,12 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 import os
 
-from fabric.api import env
 import yaml
 
+
+from fabric.api import env
+from fabric.utils import puts
+from fabric.utils import warn
 
 def files(s):
     """Return file path to a file in shared files path or locally defined.
@@ -36,10 +39,13 @@ def load_roledefs(path='contrail.yaml'):
         # log.warn('No file found at %s' % path)
         return {}
 
+
 def template_file(source, target, context=None):
     context = context and context or {}
     if not os.path.exists(source):
         source = files(source)
+
+    puts('[local] Templating: %s -> %s' % (source, target))
 
     template = open(source).read()
     open(target, 'w').write(template % context)

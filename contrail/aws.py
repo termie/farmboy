@@ -55,7 +55,7 @@ env.contrail_aws_instances = ['proxy', 'apt', 'web', 'web']
 @task
 def init():
   fabfile_context = {'roledefs': DEFAULT_ROLEDEFS,
-                     'keyfile': repr(DEFAULT_KEYFILE),
+                     'keyfile': repr('%s.yaml' % env.contrail_aws_key_pair),
                      'preamble': DEFAULT_PREAMBLE}
   util.template_file('contrail/fabfile.py', 'fabfile.py', fabfile_context)
 
@@ -72,30 +72,38 @@ def build():
     security_groups = []
 
   if not security_groups:
+    util.puts('[aws] Creating security group: %s' % security_group)
     security_group = conn.create_security_group(
         security_group, 'default security group for contrail')
-    security_group.authorize(ip_protocol='tcp',
-                             from_port='22',
-                             to_port='22',
-                             cidr_ip='0.0.0.0/0')
-    security_group.authorize(ip_protocol='tcp',
-                             from_port='80',
-                             to_port='80',
-                             cidr_ip='0.0.0.0/0')
-    security_group.authorize(ip_protocol='tcp',
-                             from_port='8000',
-                             to_port='9000',
-                             cidr_ip='0.0.0.0/0')
-    security_group.authorize(ip_protocol='udp',
-                             from_port='60000',
-                             to_port='61000',
-                             cidr_ip='0.0.0.0/0')
+
+    rules = [dict(ip_protocol='tcp',
+                  from_port='22',
+                  to_port='22',
+                  cidr_ip='0.0.0.0/0'),
+             dict(ip_protocol='tcp',
+                  from_port='80',
+                  to_port='80',
+                  cidr_ip='0.0.0.0/0'),
+             dict(ip_protocol='tcp',
+                  from_port='8000',
+                  to_port='9000',
+                  cidr_ip='0.0.0.0/0'),
+             dict(ip_protocol='udp',
+                  from_port='60000',
+                  to_port='61000',
+                  cidr_ip='0.0.0.0/0')]
+    for rule in rules:
+      util.puts('[aws]   adding rule: %(ip_protocol)s:%(from_port)s-%(to_port)s'
+                ' (%(cidr_ip)s)' % rule)
+      security_group.authorize(**rule)
+
 
   security_groups = [security_group]
 
   # check for keypair
   key_pair = conn.get_key_pair(env.contrail_aws_key_pair)
   if not key_pair:
+    util.puts('[aws] Creating key pair: %s' % env.contrail_aws_key_pair)
     key_pair = conn.create_key_pair(env.contrail_aws_key_pair)
     key_pair.save('./')
 
@@ -107,11 +115,13 @@ def build():
   # TODO(termie): we _probably_ want to just terminate them all and start
   #               new ones, is there a use case for keeping them?
   for instance in running_instances:
+    util.puts('[aws] Terminating running instance: %s' % instance.instance_id)
     instance.terminate()
 
   machines = env.contrail_aws_instances
 
   # launch instances with in security group, with keypair
+  util.puts('[aws] Starting %d instances' % len(machines))
   reservation = conn.run_instances(image_id=env.contrail_aws_image_id,
                                    min_count=len(machines),
                                    max_count=len(machines),
@@ -124,6 +134,7 @@ def build():
   # tag the instances with their roles
   for machine in machines:
     inst = new_instances.pop()
+    util.puts('[aws]  assigning role: %s -> %s' % (inst.instance_id, machine))
     inst.add_tag('contrail', machine)
 
   execute(refresh)
@@ -133,6 +144,8 @@ def build():
 def refresh():
   """Query AWS and dump the IPs we care about to a yaml file."""
   conn = ec2.connect_to_region(env.contrail_aws_region)
+
+  util.puts('[aws] Fetching running and pending instances')
   running_instances = conn.get_only_instances(
       filters={'tag-key': 'contrail',
                'instance-state-name': 'pending',
@@ -141,11 +154,13 @@ def refresh():
   o = {'roledefs': {}}
   for inst in running_instances:
     role = str(inst.tags['contrail'])
+    util.puts('[aws]   found: %s (%s)' % (inst.ip_address, role))
     role_l = o['roledefs'].get(role, [])
     role_l.append(str('%s@%s' % (env.contrail_aws_image_user, inst.ip_address)))
 
     o['roledefs'][role] = role_l
 
+  util.puts('[aws] Dumping roledefs to file: %s' % DEFAULT_ROLEDEF_FILE)
   yaml.dump(o,
             stream=open(DEFAULT_ROLEDEF_FILE, 'w'),
             default_flow_style=False,
