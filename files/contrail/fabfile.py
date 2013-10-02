@@ -1,13 +1,14 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 
 # This is a templated file generated from files/contrail/fabfile.py,
-# commands such as `contrail vagrant.init` will produce an output
+# by commands such as `contrail vagrant.init` will produce an output
 # version in your local directory that you can then modify to your
 # heart's content.
 
 import os
 
 from contrail import aptcacher
+from contrail import aws
 from contrail import core
 from contrail import django
 from contrail import gitlab
@@ -24,14 +25,10 @@ from fabric.api import env
 from fabric.api import execute
 from fabric.api import task
 
+%(preamble)s
 
 # Private key that we'll use to connect to the machines
-env.key_filename = os.path.expanduser('~/.vagrant.d/insecure_private_key')
-
-# Since we're be using apt caching, point out where that proxy will live.
-# POWER TIP: If you're already using such a proxy, you can just point this
-#            at that server and skip the `execute(aptcacher.deploy)` step.
-env.contrail_apt_proxy = %(apt_proxy)s
+env.key_filename = %(keyfile)s
 
 # Define which servers go with which roles.
 # POWER TIP: These can defined as callables as well if you want to load
@@ -41,7 +38,16 @@ env.contrail_apt_proxy = %(apt_proxy)s
 #            or use the helper `env.roledefs = util.load_roledefs()`
 env.roledefs.update(%(roledefs)s)
 
+# Since we're be using apt caching, point out where that proxy will live.
+# POWER TIP: If you're already using such a proxy, you can just point this
+#            at that server and skip the `execute(aptcacher.deploy)` step.
+if env.roledefs['apt']:
+    apt = env.roledefs['apt'][0]
+    env.contrail_apt_proxy = 'http://%%s:3142' %% util.host(apt)
+
 # Where our django app lives (this directory will be pushed to web servers).
+# This is expected to be the directory that contains the manage.py file for
+# a default django setup.
 # POWER TIP: We expect this to be in the current directory by default
 #            but a full path works here, too.
 # POWER TIP: You can set the path directly as we do below in the execute
@@ -59,8 +65,9 @@ env.contrail_files = './files'
 
 @task(default=True)
 def demo():
-    execute(aptcacher.deploy)
-    execute(aptcacher.set_proxy)
+    if env.roledefs['apt']:
+        execute(aptcacher.deploy)
+        execute(aptcacher.set_proxy)
     execute(core.install_user)
     execute(haproxy.deploy)
     execute(nginx.deploy)

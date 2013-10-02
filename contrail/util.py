@@ -29,9 +29,12 @@ def load_roledefs(path='contrail.yaml'):
     Looks first for the 'roledefs' key, otherwise
     assume the roledefs are root elements.
     """
-    doc = yaml.load(open(path))
-    return doc.get('roledefs', doc)
-
+    try:
+        doc = yaml.load(open(path))
+        return doc.get('roledefs', doc)
+    except IOError:
+        # log.warn('No file found at %s' % path)
+        return {}
 
 def template_file(source, target, context=None):
     context = context and context or {}
@@ -40,3 +43,8 @@ def template_file(source, target, context=None):
 
     template = open(source).read()
     open(target, 'w').write(template % context)
+
+
+def host(s):
+    """Try to get a host out of something like username@ipaddress."""
+    return s.split('@')[-1]
