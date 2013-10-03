@@ -93,13 +93,13 @@ use when getting started::
   contrail vagrant.init   # create an example vagrant environment in the
                           # current directory
 
-  contrail files.init     # make a local copy of the various config file
+  contrail files.init     # [TODO] make a local copy of the various config file
                           # templates that contrail uses so that you can
                           # override specific ones to work with your project
 
   contrail openstack.init # [TODO] like vagrant.init but for OpenStack
 
-  contrail aws.init       # [TODO] like vagrant.init but for AWS
+  contrail aws.init       # like vagrant.init but for AWS
 
 
 
@@ -108,7 +108,7 @@ Configuration
 
 We've tried to be exceptionally verbose in the example fabfiles we provide
 you with, so take a look in there after you do a contrail <something>.init
-or just take a look at files/contrail/fabfile.py
+or take a look at the template in files/contrail/fabfile.py
 
 
 
@@ -130,7 +130,7 @@ When you are using something like Vagrant for local VMs it is easy to assign
 specific IPs that never have to change to your VMs. In these cases you can
 accept the default configuration templates provided by Contrail.
 
-<see fabfile_vagrant.py>
+See fabfile after `contrail vagrant.init`.
 
 The code is just templated, so should you want to make any changes, go ahead
 and modify it to meet your requirements.
@@ -148,7 +148,8 @@ For these situations Contrail gives you a few templates for launching
 instances in different environments that you can modify with your details,
 and a tool to query your instances and cache the IP configuration locally.
 
-<see build_aws.py>
+See fabfile after `contrail aws.init` and look at the code for
+contrail/aws.py:refresh.
 
 
 --------------
