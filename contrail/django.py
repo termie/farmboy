@@ -20,6 +20,7 @@ from contrail import gunicorn
 
 @roles('web')
 @task
+@parallel
 def deploy(path=None, use_gunicorn=True):
     """Put a django site onto the web servers."""
     if path is None:
