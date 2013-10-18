@@ -4,41 +4,41 @@ import boto.exception
 from boto import ec2
 import yaml
 
-from stableboy import util
+from farmboy import util
 
 from fabric.api import env
 from fabric.api import execute
 from fabric.api import task
 
 
-env.stableboy_aws_region = 'us-west-2'
-env.stableboy_aws_security_group = 'stableboy'
-env.stableboy_aws_key_pair = 'stableboy'
-env.stableboy_aws_image_id = 'ami-1e0c902e' #us-west-2 raring amd64
-env.stableboy_aws_image_user = 'ubuntu'
+env.farmboy_aws_region = 'us-west-2'
+env.farmboy_aws_security_group = 'farmboy'
+env.farmboy_aws_key_pair = 'farmboy'
+env.farmboy_aws_image_id = 'ami-1e0c902e' #us-west-2 raring amd64
+env.farmboy_aws_image_user = 'ubuntu'
 
 
-DEFAULT_ROLEDEF_FILE = 'stableboy.aws.yaml'
-DEFAULT_KEYFILE = 'stableboy.pem'
+DEFAULT_ROLEDEF_FILE = 'farmboy.aws.yaml'
+DEFAULT_KEYFILE = 'farmboy.pem'
 DEFAULT_ROLEDEFS = """util.load_roledefs('%s')""" % DEFAULT_ROLEDEF_FILE
 DEFAULT_PREAMBLE = """
 
-# The AWS utilities can launch your VMs for you using `stableboy aws.build`.
+# The AWS utilities can launch your VMs for you using `farmboy aws.build`.
 # This setting tells them how many and which roles to use, it will cache
-# their addresses by default into the stableboy.aws.yaml file so that we
+# their addresses by default into the farmboy.aws.yaml file so that we
 # can target them for the rest of our actions.
-# POWER TIP: Use `stableboy aws.refresh` to update the stableboy.aws.yaml
+# POWER TIP: Use `farmboy aws.refresh` to update the farmboy.aws.yaml
 #            file if you've manually changed your instances on EC2.
-env.stableboy_aws_instances = ['proxy', 'apt', 'web', 'web']
+env.farmboy_aws_instances = ['proxy', 'apt', 'web', 'web']
 
 # These are the various AWS-related configuration options and their default
 # values. They should be pretty self explanatory for people who've used AWS.
 
-# env.stableboy_aws_region = %(region)s
-# env.stableboy_aws_security_group = %(security_group)s
-# env.stableboy_aws_key_pair = %(key_pair)s
-# env.stableboy_aws_image_id = %(image_id)s  # us-west-2 raring amd64
-# env.stableboy_aws_image_user = %(image_user)s
+# env.farmboy_aws_region = %(region)s
+# env.farmboy_aws_security_group = %(security_group)s
+# env.farmboy_aws_key_pair = %(key_pair)s
+# env.farmboy_aws_image_id = %(image_id)s  # us-west-2 raring amd64
+# env.farmboy_aws_image_user = %(image_user)s
 
 # We're using `boto` for the built-in EC2 tools, so if you use those
 # you should define the common AWS environment variables in your shell:
@@ -46,25 +46,25 @@ env.stableboy_aws_instances = ['proxy', 'apt', 'web', 'web']
 #   AWS_ACCESS_KEY_ID
 #   AWS_SECRET_ACCESS_KEY
 
-""" % {'region': repr(env.stableboy_aws_region),
-       'security_group': repr(env.stableboy_aws_security_group),
-       'key_pair': repr(env.stableboy_aws_key_pair),
-       'image_id': repr(env.stableboy_aws_image_id),
-       'image_user': repr(env.stableboy_aws_image_user)}
+""" % {'region': repr(env.farmboy_aws_region),
+       'security_group': repr(env.farmboy_aws_security_group),
+       'key_pair': repr(env.farmboy_aws_key_pair),
+       'image_id': repr(env.farmboy_aws_image_id),
+       'image_user': repr(env.farmboy_aws_image_user)}
 
 
 @task
 def init():
   fabfile_context = {'roledefs': DEFAULT_ROLEDEFS,
-                     'keyfile': repr('%s.pem' % env.stableboy_aws_key_pair),
+                     'keyfile': repr('%s.pem' % env.farmboy_aws_key_pair),
                      'preamble': DEFAULT_PREAMBLE}
-  util.template_file('stableboy/fabfile.py', 'fabfile.py', fabfile_context)
+  util.template_file('farmboy/fabfile.py', 'fabfile.py', fabfile_context)
 
 
 @task
 def build():
-  conn = ec2.connect_to_region(env.stableboy_aws_region)
-  security_group = env.stableboy_aws_security_group
+  conn = ec2.connect_to_region(env.farmboy_aws_region)
+  security_group = env.farmboy_aws_security_group
 
   # check for security group
   try:
@@ -75,7 +75,7 @@ def build():
   if not security_groups:
     util.puts('[aws] Creating security group: %s' % security_group)
     security_group = conn.create_security_group(
-        security_group, 'default security group for stableboy')
+        security_group, 'default security group for farmboy')
 
     rules = [dict(ip_protocol='tcp',
                   from_port='22',
@@ -107,22 +107,22 @@ def build():
   security_groups = [security_group]
 
   # check for keypair
-  key_pair = conn.get_key_pair(env.stableboy_aws_key_pair)
+  key_pair = conn.get_key_pair(env.farmboy_aws_key_pair)
   if not key_pair:
-    util.puts('[aws] Creating key pair: %s' % env.stableboy_aws_key_pair)
-    key_pair = conn.create_key_pair(env.stableboy_aws_key_pair)
+    util.puts('[aws] Creating key pair: %s' % env.farmboy_aws_key_pair)
+    key_pair = conn.create_key_pair(env.farmboy_aws_key_pair)
     key_pair.save('./')
 
   execute(terminate)
 
-  machines = env.stableboy_aws_instances
+  machines = env.farmboy_aws_instances
 
   # launch instances with in security group, with keypair
   util.puts('[aws] Starting %d instances' % len(machines))
-  reservation = conn.run_instances(image_id=env.stableboy_aws_image_id,
+  reservation = conn.run_instances(image_id=env.farmboy_aws_image_id,
                                    min_count=len(machines),
                                    max_count=len(machines),
-                                   key_name=env.stableboy_aws_key_pair,
+                                   key_name=env.farmboy_aws_key_pair,
                                    security_groups=security_groups)
 
   # get instances for returned reservation
@@ -132,17 +132,17 @@ def build():
   for machine in machines:
     inst = new_instances.pop()
     util.puts('[aws]   assigning role: %s -> %s' % (inst.id, machine))
-    inst.add_tag('stableboy', machine)
+    inst.add_tag('farmboy', machine)
 
   execute(refresh, expected=len(machines))
 
 
 @task
 def terminate():
-  conn = ec2.connect_to_region(env.stableboy_aws_region)
+  conn = ec2.connect_to_region(env.farmboy_aws_region)
   # check for instances
   running_instances = conn.get_only_instances(
-      filters={'tag-key': 'stableboy',
+      filters={'tag-key': 'farmboy',
                'instance-state-name': 'pending',
                'instance-state-name': 'running'})
 
@@ -150,20 +150,20 @@ def terminate():
   #               new ones, is there a use case for keeping them?
   for instance in running_instances:
     util.puts('[aws] Terminating running instance: %s (%s)'
-              % (instance.id, instance.tags['stableboy']))
+              % (instance.id, instance.tags['farmboy']))
     instance.terminate()
 
 
 @task
 def refresh(expected=None):
   """Query AWS and dump the IPs we care about to a yaml file."""
-  conn = ec2.connect_to_region(env.stableboy_aws_region)
+  conn = ec2.connect_to_region(env.farmboy_aws_region)
 
   max_tries = 15
   for i in range(max_tries):
     util.puts('[aws] Fetching running and pending instances')
     running_instances = conn.get_only_instances(
-        filters={'tag-key': 'stableboy',
+        filters={'tag-key': 'farmboy',
                  'instance-state-name': 'pending',
                  'instance-state-name': 'running'})
 
@@ -187,10 +187,10 @@ def refresh(expected=None):
 
   o = {'roledefs': {}}
   for inst in running_instances:
-    role = str(inst.tags['stableboy'])
+    role = str(inst.tags['farmboy'])
     util.puts('[aws]   found: %s (%s)' % (inst.ip_address, role))
     role_l = o['roledefs'].get(role, [])
-    role_l.append(str('%s@%s' % (env.stableboy_aws_image_user, inst.ip_address)))
+    role_l.append(str('%s@%s' % (env.farmboy_aws_image_user, inst.ip_address)))
 
     o['roledefs'][role] = role_l
 

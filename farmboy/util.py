@@ -12,9 +12,9 @@ def files(s):
     """Return file path to a file in shared files path or locally defined.
 
     Check whether the file exists in the defined path otherwise
-    fallback to the one shipped with Contrail.
+    fallback to the one shipped with Farm Boy.
     """
-    path = os.path.join(env.get('stableboy_files'), s)
+    path = os.path.join(env.get('farmboy_files'), s)
     if os.path.exists(path):
         return path
 
@@ -23,10 +23,10 @@ def files(s):
 
 
 def home(s):
-    return os.path.join('/home/%s' % env.get('stableboy_user'), s)
+    return os.path.join('/home/%s' % env.get('farmboy_user'), s)
 
 
-def load_roledefs(path='stableboy.yaml'):
+def load_roledefs(path='farmboy.yaml'):
     """Return roledefs from a yaml file.
 
     Looks first for the 'roledefs' key, otherwise

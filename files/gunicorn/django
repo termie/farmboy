@@ -1,9 +1,9 @@
 CONFIG = {
     'mode': 'django',
     'environment': {
-         'PYTHONPATH': '/home/stableboy/www/%(project)s',
+         'PYTHONPATH': '/home/farmboy/www/%(project)s',
     },
-    'working_dir': '/home/stableboy/www/%(project)s',
+    'working_dir': '/home/farmboy/www/%(project)s',
     'user': 'www-data',
     'group': 'www-data',
     'args': (

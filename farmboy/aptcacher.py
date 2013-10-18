@@ -3,7 +3,7 @@
 import fabtools.deb
 import fabtools.require
 
-from stableboy import util
+from farmboy import util
 
 
 from fabric.api import env
@@ -14,7 +14,7 @@ from fabric.api import task
 
 
 def _set_env_defaults():
-    env.setdefault('stableboy_apt_proxy', 'http://192.168.33.13:3142')
+    env.setdefault('farmboy_apt_proxy', 'http://192.168.33.13:3142')
 
 
 _set_env_defaults()
@@ -51,7 +51,7 @@ def deploy():
 @parallel
 def set_proxy(proxy=None):
     if proxy is None:
-        proxy = env.stableboy_apt_proxy
+        proxy = env.farmboy_apt_proxy
 
     fabtools.require.files.template_file(
         template_source   = util.files('apt-cacher/01apt-cacher'),

@@ -2,7 +2,7 @@
 import fabtools.nginx
 import fabtools.require
 
-from stableboy import util
+from farmboy import util
 
 
 from fabric.api import parallel

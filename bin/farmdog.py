@@ -1,4 +1,4 @@
-"""Simple directory watching tool to trigger stableboy commands."""
+"""Simple directory watching tool to trigger farmboy commands."""
 
 import argparse
 import os

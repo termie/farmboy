@@ -4,17 +4,17 @@ except:
     from distutils.core import setup
 
 config = dict(
-    name='stableboy',
+    name='farmboy',
     version='0.1.0',
-    url='https://github.com/termie/stableboy',
+    url='https://github.com/termie/farmboy',
     description='Rapid development environments.',
     author='Andy Smith',
     author_email='github@anarkystic.com',
     install_requires=['fabric', 'fabtools'],
-    packages=['stableboy'],
+    packages=['farmboy'],
     entry_points={
         'console_scripts': [
-            'stableboy = stableboy.cli:main',
+            'farmboy = farmboy.cli:main',
         ],
     },
 )

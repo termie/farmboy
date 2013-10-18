@@ -1,7 +1,7 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
 import fabtools.require
 
-from stableboy import util
+from farmboy import util
 
 
 from fabric.api import env
