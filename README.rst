@@ -8,13 +8,18 @@ We take a developer-centric approach to managing your environments, ditching
 the "Ops" in "DevOps" by providing a well-behaved library instead of a
 framework and tools to take the leg-work out of working with that library.
 
-We hate opaque systems and try to be as transparent and easy to hack as
-possible because *you are smart*. And we want to make you even smarter by
-giving you the tools to try new things quickly.
+We want the pieces of our library to work together in predictable ways so
+that you can write your own additions and leverage our well-designed
+internal architecture.
 
-We love test-driven development but sometimes making a tiny code change and
-being able to manually test it right away will teach you more about the
-problem, faster, than building the test framework to replicate it.
+We hate opaque systems and try to be as transparent and easy to hack as
+possible because *you are smart*.
+
+And we want to make you even smarter by giving you the tools to try new
+things quickly. We love test-driven development but sometimes making a
+tiny code change and being able to manually test it right away will teach
+you more about the problem, faster, than building the test framework to
+replicate it.
 
 
 Stuff We Know How To Configure Already
