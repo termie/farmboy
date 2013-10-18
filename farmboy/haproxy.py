@@ -15,7 +15,7 @@ WEB_SERVER = '  server web%(i)s %(host)s:%(port)s maxconn 32'
 @roles('proxy')
 @task
 def deploy():
-    """Deploy all the proxy server bits."""
+    """Add HAproxy to the <proxy> host."""
     fabtools.require.deb.packages([
         'haproxy'
     ])

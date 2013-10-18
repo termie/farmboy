@@ -11,7 +11,7 @@ from fabric.api import task
 @task
 @parallel
 def deploy():
-    """Add tomcat to the web servers."""
+    """Add tomcat to the <web> hosts."""
     fabtools.require.deb.packages([
         'tomcat7'
     ])

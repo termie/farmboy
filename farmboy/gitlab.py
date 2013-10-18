@@ -21,6 +21,7 @@ from fabric.context_managers import cd
 @roles('vcs')
 @task
 def depends():
+    """Update dependencies for GitLab on the <vcs> host."""
     fabtools.deb.update_index(quiet=False)
     fabtools.require.deb.packages([
         'build-essential',
@@ -311,6 +312,12 @@ def site_configuration():
 @roles('vcs')
 @task(default=True)
 def deploy():
+    """Deploy a full GitLab instance to the <vcs> host.
+
+    Because this is a rather large app, be aware that this instance
+    should have at least 1GB of RAM associated with it.
+    """
+
     execute(depends)
     execute(ruby)
     execute(bundler)

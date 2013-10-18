@@ -27,6 +27,7 @@ _set_env_defaults()
 @task
 @parallel
 def install_user(user=DEFAULT_USER):
+    """Ensure our default user has been created on all hosts."""
     env.farmboy_user = user
     fabtools.require.user(user, shell='/bin/bash')
     fabtools.deb.update_index(quiet=False)

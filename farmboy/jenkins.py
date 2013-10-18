@@ -69,6 +69,7 @@ def setup_ssh_keys():
 @roles('ci')
 @task
 def deploy():
+    """Deploy a Jenkins server to the <ci> host."""
     #setup_machine()
     #setup_apache()
     #if auth_username:

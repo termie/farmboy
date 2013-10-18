@@ -14,7 +14,7 @@ from fabric.api import task
 @task
 @parallel
 def deploy():
-    """Deploy multiple web / app servers."""
+    """Add nginx to the the <web> hosts."""
     fabtools.require.nginx.server()
     fabtools.require.file(
         source   = util.files('nginx/web'),

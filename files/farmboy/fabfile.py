@@ -65,6 +65,7 @@ env.farmboy_files = './files'
 
 @task(default=True)
 def demo():
+    """Example deployment of an haproxy+nginx+gunicorn+django."""
     if env.roledefs['apt']:
         execute(aptcacher.deploy)
         execute(aptcacher.set_proxy)

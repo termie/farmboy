@@ -23,6 +23,7 @@ _set_env_defaults()
 @roles('apt')
 @task
 def deploy():
+    """Deploy apt-cacher to the <apt> host."""
     fabtools.require.deb.packages([
         'apt-cacher'
     ])
@@ -50,6 +51,7 @@ def deploy():
 @task
 @parallel
 def set_proxy(proxy=None):
+    """Set the <apt> host as the proxy for apt on <all> hosts."""
     if proxy is None:
         proxy = env.farmboy_apt_proxy
 

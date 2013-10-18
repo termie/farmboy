@@ -13,7 +13,7 @@ from fabric.api import task
 @roles('web')
 @task
 def deploy():
-    """Add gunicorn to the web servers."""
+    """Add gunicorn to the <web> hosts."""
     fabtools.require.deb.packages([
         'gunicorn'
     ])

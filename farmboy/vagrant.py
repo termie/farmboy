@@ -26,7 +26,7 @@ KEYFILE_S = "os.path.expanduser('~/.vagrant.d/insecure_private_key')"
 
 @task
 def init():
-    """Copy vagrant-specific template to local directory."""
+    """Locally set up basic files for using Vagrant."""
     vagrantfile = util.files('vagrant/Vagrantfile')
 
     # TODO(termie): local cp or shutil?
@@ -41,4 +41,5 @@ def init():
 
 @task
 def build():
+    """Launch and prepare Vagrant instances to be used by Farm Boy."""
     local('vagrant up')

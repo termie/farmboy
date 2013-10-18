@@ -55,6 +55,7 @@ env.farmboy_aws_instances = ['proxy', 'apt', 'web', 'web']
 
 @task
 def init():
+  """Locally set up basic files for using AWS."""
   fabfile_context = {'roledefs': DEFAULT_ROLEDEFS,
                      'keyfile': repr('%s.pem' % env.farmboy_aws_key_pair),
                      'preamble': DEFAULT_PREAMBLE}
@@ -63,6 +64,11 @@ def init():
 
 @task
 def build():
+  """Launch and prepare AWS instances to be used by Farm Boy.
+
+  This will ensure that a security group and key pair exist.
+  It will also terminate any running instances tagged with `farmboy`.
+  """
   conn = ec2.connect_to_region(env.farmboy_aws_region)
   security_group = env.farmboy_aws_security_group
 
@@ -139,6 +145,7 @@ def build():
 
 @task
 def terminate():
+  """Terminate running AWS instances tagged with `farmboy`."""
   conn = ec2.connect_to_region(env.farmboy_aws_region)
   # check for instances
   running_instances = conn.get_only_instances(
@@ -156,7 +163,11 @@ def terminate():
 
 @task
 def refresh(expected=None):
-  """Query AWS and dump the IPs we care about to a yaml file."""
+  """Update local cache of IPs for AWS instances.
+
+  This will write a `farmboy.aws.yaml` file of the running instances
+  on AWS tagged with `farmboy` and their associated roles.
+  """
   conn = ec2.connect_to_region(env.farmboy_aws_region)
 
   max_tries = 15
