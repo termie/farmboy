@@ -2,7 +2,7 @@
 import fabtools.nginx
 import fabtools.require
 
-from contrail import util
+from stableboy import util
 
 
 from fabric.api import parallel

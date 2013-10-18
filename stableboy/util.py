@@ -14,7 +14,7 @@ def files(s):
     Check whether the file exists in the defined path otherwise
     fallback to the one shipped with Contrail.
     """
-    path = os.path.join(env.get('contrail_files'), s)
+    path = os.path.join(env.get('stableboy_files'), s)
     if os.path.exists(path):
         return path
 
@@ -23,10 +23,10 @@ def files(s):
 
 
 def home(s):
-    return os.path.join('/home/%s' % env.get('contrail_user'), s)
+    return os.path.join('/home/%s' % env.get('stableboy_user'), s)
 
 
-def load_roledefs(path='contrail.yaml'):
+def load_roledefs(path='stableboy.yaml'):
     """Return roledefs from a yaml file.
 
     Looks first for the 'roledefs' key, otherwise

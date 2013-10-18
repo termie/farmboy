@@ -2,7 +2,7 @@
 
 #import shutil
 
-from contrail import util
+from stableboy import util
 
 from fabric.api import env
 from fabric.api import local
@@ -36,7 +36,7 @@ def init():
                        'keyfile': KEYFILE_S,
                        'preamble': '',
                        }
-    util.template_file('contrail/fabfile.py', 'fabfile.py', fabfile_context)
+    util.template_file('stableboy/fabfile.py', 'fabfile.py', fabfile_context)
 
 
 @task

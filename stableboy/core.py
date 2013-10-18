@@ -9,12 +9,12 @@ import fabtools.deb
 import fabtools.require
 
 
-DEFAULT_USER='contrail'
+DEFAULT_USER='stableboy'
 
 
 def _set_env_defaults():
-    env.setdefault('contrail_user', DEFAULT_USER)
-    env.setdefault('contrail_files', './files')
+    env.setdefault('stableboy_user', DEFAULT_USER)
+    env.setdefault('stableboy_files', './files')
     env.skip_bad_hosts = True
     env.timeout = 2
     env.roledefs = {'apt': [], 'ci': [], 'proxy': [], 'vcs': [], 'web': []}
@@ -27,6 +27,6 @@ _set_env_defaults()
 @task
 @parallel
 def install_user(user=DEFAULT_USER):
-    env.contrail_user = user
+    env.stableboy_user = user
     fabtools.require.user(user, shell='/bin/bash')
     fabtools.deb.update_index(quiet=False)
