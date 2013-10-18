@@ -326,3 +326,6 @@ def deploy():
     execute(start_gitlab)
     #execute(sidekiq)
     execute(site_configuration)
+
+
+__all__ = ['deploy', 'depends']

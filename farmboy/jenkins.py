@@ -97,3 +97,4 @@ def test_clone_repo(repourl=''):
     sudo('rm -Rf %s' % path)
 
 
+__all__ = ['deploy']
