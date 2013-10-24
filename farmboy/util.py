@@ -40,6 +40,16 @@ def load_roledefs(path='farmboy.yaml'):
         return {}
 
 
+def load(key, path='farmboy.yaml'):
+    """Return key from a yaml file."""
+    try:
+        doc = yaml.load(open(path))
+        return doc.get(key, None)
+    except IOError:
+        # log.warn('No file found at %s' % path)
+        return None
+
+
 def template_file(source, target, context=None):
     context = context and context or {}
     if not os.path.exists(source):

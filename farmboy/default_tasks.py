@@ -10,6 +10,7 @@ from farmboy import gitlab
 from farmboy import gunicorn
 from farmboy import haproxy
 from farmboy import jenkins
+from farmboy import openstack
 from farmboy import nginx
 from farmboy import tomcat
 from farmboy import util
