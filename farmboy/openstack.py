@@ -211,7 +211,21 @@ def images(filter=None):
                        env.farmboy_os_auth_url,
                        service_type='compute')
   images = conn.images.list()
-  print images
+  for i, image in enumerate(images):
+    print '[%d] %s (%s)' % (i, image.name, image.id)
+
+  print
+  print 'Choose an image from above, or leave blank to skip.'
+  print '(It will be written to %s)' % DEFAULT_ROLEDEF_FILE
+  print
+  number = raw_input('>>> ')
+
+  if not number:
+    return
+
+  selected = images[int(number)]
+  o = {'farmboy_os_image_id': str(selected.id)}
+  util.update(o, DEFAULT_ROLEDEF_FILE)
 
 
 @task
@@ -272,9 +286,4 @@ def refresh(expected=None):
     o['roledefs'][role] = role_l
 
   util.puts('[os] Dumping roledefs to file: %s' % DEFAULT_ROLEDEF_FILE)
-  yaml.dump(o,
-            stream=open(DEFAULT_ROLEDEF_FILE, 'w'),
-            default_flow_style=False,
-            indent=2,
-            width=72)
-
+  util.update(o, DEFAULT_ROLEDEF_FILE)

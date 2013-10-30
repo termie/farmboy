@@ -50,6 +50,21 @@ def load(key, path='farmboy.yaml'):
         return None
 
 
+def update(d, path='farmboy.yaml'):
+    """Update various keys in a yaml file."""
+    try:
+        doc = yaml.load(open(path))
+    except IOError:
+        doc = {}
+
+    doc.update(d)
+    yaml.dump(d,
+              stream=open(path, 'w'),
+              default_flow_style=False,
+              indent=2,
+              width=72)
+
+
 def template_file(source, target, context=None):
     context = context and context or {}
     if not os.path.exists(source):

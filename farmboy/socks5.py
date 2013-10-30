@@ -183,7 +183,6 @@ class HttpToSocks5Handler(BaseHTTPServer.BaseHTTPRequestHandler):
     resp = buf.getvalue()
     self.wfile.write(resp)
 
-
   do_GET = do_SOCKS5
   do_POST = do_SOCKS5
   do_HEAD = do_SOCKS5
