@@ -73,9 +73,6 @@ env.farmboy_os_image_id = util.load('farmboy_os_image_id', '%(default_yaml)s')
 """ % {'default_yaml': 'farmboy.os.yaml'}
 
 
-
-
-
 @task
 def build_keypair():
   if not os.path.exists(env.farmboy_os_keyfile):
@@ -203,6 +200,18 @@ def terminate():
                 % (instance.id, instance.metadata['farmboy']))
       instance.stop()
       instance.delete()
+
+
+@task
+def images(filter=None):
+  """List the images available on the server."""
+  conn = client.Client(env.farmboy_os_username,
+                       env.farmboy_os_password,
+                       env.farmboy_os_tenant_name,
+                       env.farmboy_os_auth_url,
+                       service_type='compute')
+  images = conn.images.list()
+  print images
 
 
 @task

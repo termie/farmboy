@@ -16,6 +16,7 @@ from farmboy import gunicorn
 from farmboy import haproxy
 from farmboy import jenkins
 from farmboy import nginx
+from farmboy import socks5
 from farmboy import tomcat
 from farmboy import util
 from farmboy import vagrant
