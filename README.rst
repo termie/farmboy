@@ -228,7 +228,7 @@ FarmBoy tries to explain and demonstrate the features of Fabric that it uses
 in the fabfile it generates for you with hopes that you will be able to take
 it from there.
 
-The config file for Farm Boy is just the fabfile. And fabfiles are just
+The config file for FarmBoy is just the fabfile. And fabfiles are just
 python. Go nuts.
 
 After your initial setup you'll be using a regular fabfile to execute your
