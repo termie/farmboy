@@ -1,7 +1,7 @@
-FarmBoy: Let Us Do The Chores
-==============================
+Farm Boy: As You Wish
+=====================
 
-FarmBoy is a tool and library for rapid deployment and development of
+Farm Boy is a tool and library for rapid deployment and development of
 development environments for multi-system (cloud?) applications.
 
 We take a developer-centric approach to managing your environments, ditching
