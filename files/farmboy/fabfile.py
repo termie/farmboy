@@ -11,6 +11,7 @@ from farmboy import aptcacher
 from farmboy import aws
 from farmboy import core
 from farmboy import django
+from farmboy import dns
 from farmboy import gitlab
 from farmboy import gunicorn
 from farmboy import haproxy
@@ -71,6 +72,7 @@ def demo():
         execute(aptcacher.deploy)
         execute(aptcacher.set_proxy)
     execute(core.install_user)
+    execute(dns.hosts)
     execute(haproxy.deploy)
     execute(nginx.deploy)
     execute(gunicorn.deploy)
