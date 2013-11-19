@@ -1,7 +1,12 @@
 import time
 
-import boto.exception
-from boto import ec2
+try:
+  import boto.exception
+  from boto import ec2
+except ImportError:
+  # We'll warn the user if they try to do anything
+  pass
+
 import yaml
 
 from farmboy import util
@@ -54,6 +59,7 @@ env.farmboy_aws_instances = ['proxy', 'apt', 'web', 'web']
 
 
 @task
+@util.requires('boto', 'boto')
 def init():
   """Locally set up basic files for using AWS."""
   fabfile_context = {'roledefs': DEFAULT_ROLEDEFS,
@@ -63,6 +69,7 @@ def init():
 
 
 @task
+@util.requires('boto', 'boto')
 def build():
   """Launch and prepare AWS instances to be used by Farm Boy.
 
@@ -144,6 +151,7 @@ def build():
 
 
 @task
+@util.requires('boto', 'boto')
 def terminate():
   """Terminate running AWS instances tagged with `farmboy`."""
   conn = ec2.connect_to_region(env.farmboy_aws_region)
@@ -162,6 +170,7 @@ def terminate():
 
 
 @task
+@util.requires('boto', 'boto')
 def refresh(expected=None):
   """Update local cache of IPs for AWS instances.
 

@@ -1,7 +1,12 @@
 import os
 import time
 
-from novaclient.v1_1 import client
+try:
+  from novaclient.v1_1 import client
+except ImportError:
+  # We'll warn the user if they try to do anything
+  pass
+
 import yaml
 
 from farmboy import util
@@ -80,6 +85,7 @@ def build_keypair():
 
 
 @task
+@util.requires('novaclient', 'novaclient')
 def init():
   """Locally set up basic files for using AWS."""
   fabfile_context = {'roledefs': DEFAULT_ROLEDEFS,
@@ -89,6 +95,7 @@ def init():
 
 
 @task
+@util.requires('novaclient', 'novaclient')
 def build():
   """Launch and prepare OpenStack instances to be used by Farm Boy.
 
@@ -179,6 +186,7 @@ def build():
 
 
 @task
+@util.requires('novaclient', 'novaclient')
 def terminate():
   """Terminate running OpenStack instances tagged with `farmboy`."""
   conn = client.Client(env.farmboy_os_username,
@@ -203,6 +211,7 @@ def terminate():
 
 
 @task
+@util.requires('novaclient', 'novaclient')
 def images(filter=None):
   """List the images available on the server."""
   conn = client.Client(env.farmboy_os_username,
@@ -229,6 +238,7 @@ def images(filter=None):
 
 
 @task
+@util.requires('novaclient', 'novaclient')
 def refresh(expected=None):
   """Update local cache of IPs for OpenStack instances.
 

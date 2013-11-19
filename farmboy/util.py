@@ -1,12 +1,16 @@
 # vim: tabstop=4 shiftwidth=4 softtabstop=4
+import functools
 import os
+import sys
 
+import pkg_resources
 import yaml
 
 
 from fabric.api import env
 from fabric.utils import puts
 from fabric.utils import warn
+
 
 def files(s):
     """Return file path to a file in shared files path or locally defined.
@@ -79,3 +83,21 @@ def template_file(source, target, context=None):
 def host(s):
     """Try to get a host out of something like username@ipaddress."""
     return s.split('@')[-1]
+
+
+# decorator
+class requires(object):
+    """Throw an error if missing a requirement."""
+
+    def __init__(self, module, package):
+        self._module = module
+        self._package = package
+
+    def __call__(self, f):
+        if self._module not in sys.modules:
+            @functools.wraps(f)
+            def _requires(*args, **kw):
+                raise Exception('This task requires an additional package: '
+                                '%s' % (self._package))
+            return _requires
+        return f

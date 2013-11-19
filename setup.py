@@ -1,7 +1,4 @@
-try:
-    from setuptools import setup
-except:
-    from distutils.core import setup
+from setuptools import setup
 
 config = dict(
     name='farmboy',
@@ -11,6 +8,11 @@ config = dict(
     author='Andy Smith',
     author_email='github@anarkystic.com',
     install_requires=['fabric', 'fabtools'],
+    extras_require={
+        'openstack': ['novaclient'],
+        'aws': ['boto'],
+    },
+    #package_data={'farmboy': ['files/*']},
     packages=['farmboy'],
     entry_points={
         'console_scripts': [
