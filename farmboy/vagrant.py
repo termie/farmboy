@@ -36,7 +36,9 @@ def init():
                        'keyfile': KEYFILE_S,
                        'preamble': '',
                        }
-    util.template_file('farmboy/fabfile.py', 'fabfile.py', fabfile_context)
+    util.template_file('farmboy/fabfile.py.template',
+                       'fabfile.py',
+                       fabfile_context)
 
 
 @task

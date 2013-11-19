@@ -24,7 +24,8 @@ def files(s):
 
     # TODO(termie): use pkg_resources or whatnot to get the path to the
     #               files we installed with the package
-
+    path = pkg_resources.resource_filename(__name__, 'files/%s' % s)
+    return path
 
 def home(s):
     return os.path.join('/home/%s' % env.get('farmboy_user'), s)

@@ -65,7 +65,9 @@ def init():
   fabfile_context = {'roledefs': DEFAULT_ROLEDEFS,
                      'keyfile': repr('%s.pem' % env.farmboy_aws_key_pair),
                      'preamble': DEFAULT_PREAMBLE}
-  util.template_file('farmboy/fabfile.py', 'fabfile.py', fabfile_context)
+  util.template_file('farmboy/fabfile.py.template',
+                     'fabfile.py',
+                     fabfile_context)
 
 
 @task
