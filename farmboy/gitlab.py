@@ -66,8 +66,8 @@ def ruby(force=False):
             path    = '/tmp/ruby')
 
         fabtools.require.file(
-            source  = 'files/ruby/ruby-1.9.3-p327.tar.gz',
-            path    = '/tmp/ruby/ruby-1.9.3-p327.tar.gz')
+            url  = 'http://mirrors.ibiblio.org/ruby/1.9/ruby-1.9.3-p327.tar.gz',
+            path = '/tmp/ruby/ruby-1.9.3-p327.tar.gz')
 
         with cd('/tmp/ruby'):
             run('tar zxvf ruby-1.9.3-p327.tar.gz')
