@@ -1,6 +1,3 @@
-# NOTE(termie): this is kind of a dumb hack to make the UI in fabric look
-#               classy for dealing with our config file templates
-
 import errno
 import os
 
@@ -29,19 +26,19 @@ def init(force=False):
   #_makedir(env.get('farmboy_files'))
   _makedir('./files')
 
-  top_level = pkg_resources.resource_listdir(__name__, '')
+  top_level = pkg_resources.resource_listdir(__name__, '_files')
   for path in top_level:
-    if not pkg_resources.resource_isdir(__name__, path):
+    if not pkg_resources.resource_isdir(__name__, '_files/%s' % path):
       continue
 
     _makedir('./files/%s' % path)
 
-    for sub in pkg_resources.resource_listdir(__name__, path):
+    for sub in pkg_resources.resource_listdir(__name__, '_files/%s' % path):
       new_path = './files/%s/%s' % (path, sub)
       if not force and os.path.exists(new_path):
         continue
 
       old_path = pkg_resources.resource_filename(__name__,
-                                                 '%s/%s' % (path, sub))
+                                                 '_files/%s/%s' % (path, sub))
 
       local('cp %s %s' % (old_path, new_path))

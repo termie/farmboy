@@ -24,7 +24,7 @@ def files(s):
 
     # TODO(termie): use pkg_resources or whatnot to get the path to the
     #               files we installed with the package
-    path = pkg_resources.resource_filename(__name__, 'files/%s' % s)
+    path = pkg_resources.resource_filename(__name__, '_files/%s' % s)
     return path
 
 def home(s):

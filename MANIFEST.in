@@ -1,1 +1,1 @@
-recursive-include farmboy/files *
+recursive-include farmboy/_files *

@@ -12,7 +12,7 @@ config = dict(
         'openstack': ['novaclient'],
         'aws': ['boto'],
     },
-    package_data={'farmboy': ['files/*/*']},
+    package_data={'farmboy': ['_files/*/*']},
     packages=['farmboy'],
     entry_points={
         'console_scripts': [
