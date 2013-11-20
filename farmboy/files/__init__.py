@@ -45,4 +45,3 @@ def init(force=False):
                                                  '%s/%s' % (path, sub))
 
       local('cp %s %s' % (old_path, new_path))
-
