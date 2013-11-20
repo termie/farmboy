@@ -6,6 +6,7 @@ from farmboy import aptcacher
 from farmboy import aws
 from farmboy import core
 from farmboy import django
+from farmboy import files
 from farmboy import gitlab
 from farmboy import gunicorn
 from farmboy import haproxy
