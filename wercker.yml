@@ -16,3 +16,27 @@ build:
     - script:
         name: sdist
         code: python setup.py sdist
+
+    - script:
+        name: install sdist
+        code: |-
+          mkdir temp
+          cd temp
+          tar -xvzf ../dist/farmboy*
+          cd farmboy*
+          python setup.py install
+
+    - script:
+        name: basic files test
+        code: |-
+          cd ..
+          farmboy files.init
+
+  after-steps:
+    - wouter/irc-notify:
+        server: irc.freenode.net
+        port: 6667
+        nickname: farmboy-wercker
+        channel: farmboy
+        on: failed
+        failed-message: "termie: your fucking build failed for farmboy: https://app.wercker.com/#applications/528c060a9baffb3860004908/tab/builds"

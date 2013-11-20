@@ -7,7 +7,7 @@ config = dict(
     description='Rapid development environments.',
     author='Andy Smith',
     author_email='github@anarkystic.com',
-    install_requires=['fabric', 'fabtools'],
+    install_requires=['fabric', 'fabtools', 'pyyaml'],
     extras_require={
         'openstack': ['novaclient'],
         'aws': ['boto'],
