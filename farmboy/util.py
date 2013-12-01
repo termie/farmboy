@@ -63,7 +63,7 @@ def update(d, path='farmboy.yaml'):
         doc = {}
 
     doc.update(d)
-    yaml.dump(d,
+    yaml.dump(doc,
               stream=open(path, 'w'),
               default_flow_style=False,
               indent=2,

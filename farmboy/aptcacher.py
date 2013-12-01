@@ -47,7 +47,7 @@ def deploy():
     fabtools.require.service.restarted('apt-cacher')
 
 
-@roles('ci', 'proxy', 'vcs', 'web')
+@roles('db', 'ci', 'proxy', 'vcs', 'web')
 @task
 @parallel
 def set_proxy(proxy=None):

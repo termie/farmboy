@@ -23,7 +23,7 @@ def _set_env_defaults():
 _set_env_defaults()
 
 
-@roles('proxy', 'web')
+@roles('proxy', 'web', 'db', 'ci', 'vcs', 'apt')
 @task
 @parallel
 def install_user(user=DEFAULT_USER):

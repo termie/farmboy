@@ -17,6 +17,7 @@ from farmboy import gitlab
 from farmboy import gunicorn
 from farmboy import haproxy
 from farmboy import jenkins
+from farmboy import mysql
 from farmboy import nginx
 from farmboy import socks5
 from farmboy import tomcat
@@ -48,6 +49,11 @@ if env.roledefs['apt']:
     apt = env.roledefs['apt'][0]
     env.farmboy_apt_proxy = 'http://%%s:3142' %% util.host(apt)
 
+# Let's load our MySQL password from our local yaml file, too.
+# If there isn't one in there, we'll auto-generate one during the
+# `mysql.deploy` step.
+env.farmboy_mysql_password = util.load('mysql_password')
+
 # Where our django app lives (this directory will be pushed to web servers).
 # This is expected to be the directory that contains the manage.py file for
 # a default django setup.
@@ -74,6 +80,7 @@ def demo():
         execute(aptcacher.set_proxy)
     execute(core.install_user)
     execute(dns.hosts)
+    execute(mysql.deploy)
     execute(haproxy.deploy)
     execute(nginx.deploy)
     execute(gunicorn.deploy)

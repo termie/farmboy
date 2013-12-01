@@ -11,6 +11,7 @@ from fabric.api import task
 
 DEFAULT_ROLEDEFS = {
     'proxy': ['vagrant@192.168.33.10'],
+    'db': ['vagrant@192.168.33.11'],
     #'vcs': ['vagrant@192.168.33.11'],
     #'ci': ['vagrant@192.168.33.12'],
     'apt': ['vagrant@192.168.33.13'],
@@ -32,7 +33,9 @@ def init():
     # TODO(termie): local cp or shutil?
     local('cp %s %s' % (vagrantfile, './Vagrantfile'))
     #shutil.copy(vagrantfile, './Vagrantfile')
-    fabfile_context = {'roledefs': repr(DEFAULT_ROLEDEFS),
+    util.update({'roledefs': DEFAULT_ROLEDEFS})
+
+    fabfile_context = {'roledefs': "util.load_roledefs()",
                        'keyfile': KEYFILE_S,
                        'preamble': '',
                        }
