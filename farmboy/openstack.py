@@ -7,8 +7,6 @@ except ImportError:
   # We'll warn the user if they try to do anything
   pass
 
-import yaml
-
 from farmboy import util
 
 from fabric.api import env
@@ -21,34 +19,57 @@ env.farmboy_os_password = os.environ.get('OS_PASSWORD', '')
 env.farmboy_os_tenant_name = os.environ.get('OS_TENANT_NAME', '')
 env.farmboy_os_auth_url = os.environ.get('OS_AUTH_URL', '')
 
-env.farmboy_os_image_id = '89bd93bd-9523-422d-8e1d-9a301e599df1' # ubuntu 13.04
+env.farmboy_os_image_id = None  # You'll want ubuntu 13.04
 env.farmboy_os_image_user = 'ubuntu'
-env.farmboy_os_flavor_id = '2' #m1.small
+env.farmboy_os_flavor_id = None  # You probably want m1.small
+env.farmboy_os_neutron = True
+env.farmboy_os_network_id = None  # You probably want 'cloud'
+env.farmboy_os_network_name = 'private'  # 'private' unless using Neutron
 env.farmboy_os_reservation_id = 'farmboy'
 env.farmboy_os_security_group = 'farmboy'
 env.farmboy_os_keypair = 'farmboy'
 env.farmboy_os_keyfile = 'farmboy.key'
 env.farmboy_os_keyfile_public = 'farmboy.key.pub'
 
-DEFAULT_ROLEDEF_FILE = 'farmboy.os.yaml'
+DEFAULT_ROLEDEF_FILE = 'farmboy.yaml'
 DEFAULT_KEYFILE = 'farmboy.pem'
 DEFAULT_ROLEDEFS = """util.load_roledefs('%s')""" % DEFAULT_ROLEDEF_FILE
 DEFAULT_PREAMBLE = """
 
 # The Openstack utilities can launch your VMs for you using
 # `farmboy openstack.build`. This setting tells them how many and which roles
-# to use, it will cache their addresses by default into the farmboy.os.yaml
+# to use, it will cache their addresses by default into the farmboy.yaml
 # file so that we can target them for the rest of our actions.
-# POWER TIP: Use `farmboy openstack.refresh` to update the farmboy.os.yaml
+# POWER TIP: Use `farmboy openstack.refresh` to update the farmboy.yaml
 #            file if you've manually changed your instances.
 env.farmboy_os_instances = ['proxy', 'apt', 'web', 'web']
+
+# We generally want to use a stock Ubuntu 13.04 cloud image, you'll need
+# to figure out the ID of one (or upload it using the dashboard).
+# POWER TIP: Or you can use our handy picker! `farmboy openstack.images`
+env.farmboy_os_image_id = util.load('farmboy_os_image_id', '%(default_yaml)s')
+
+# We usually use the `m1.small` flavor, if this isn't configured already
+# the `farmboy openstack.build` command will prompt you with choices.
+# POWER TIP: You can use our handy picker! `farmboy openstack.flavors`
+env.farmboy_os_flavor_id = util.load('farmboy_os_flavor_id', '%(default_yaml)s')
 
 # We generally want to use a stock Ubuntu 13.04 cloud image, you'll need
 # to figure out the ID of one (or upload it using the dashboard).
 # POWER TIP: Or you can use our handy picker!
 env.farmboy_os_image_id = util.load('farmboy_os_image_id', '%(default_yaml)s')
 
-# These are the various OpenStack-related configuration options and their
+# If you are using an Openstack cloud that is using Neutron, you need to
+# to do some additional network config
+env.farmboy_os_neutron = True
+if env.farmboy_os_neutron:
+  env.farmboy_os_network_id = util.load('farmboy_os_network_id',
+                                        '%(default_yaml)s')
+  env.farmboy_os_network_name = util.load('farmboy_os_network_name',
+                                          '%(default_yaml)s')
+
+
+# These are the various Openstack-related configuration options and their
 # default values. They should be pretty self explanatory for people who've
 # used OpenStack.
 
@@ -58,7 +79,6 @@ env.farmboy_os_image_id = util.load('farmboy_os_image_id', '%(default_yaml)s')
 # env.farmboy_os_auth_url = os.environ.get('OS_AUTH_URL', '')
 
 # env.farmboy_os_image_user = 'ubuntu'
-# env.farmboy_os_flavor_id = '2' #m1.small, usually
 # env.farmboy_os_reservation_id = 'farmboy'
 # env.farmboy_os_security_group = 'farmboy'
 # env.farmboy_os_keypair = 'farmboy'
@@ -75,7 +95,7 @@ env.farmboy_os_image_id = util.load('farmboy_os_image_id', '%(default_yaml)s')
 #   OS_TENANT_NAME
 #   OS_AUTH_URL
 
-""" % {'default_yaml': 'farmboy.os.yaml'}
+""" % {'default_yaml': DEFAULT_ROLEDEF_FILE}
 
 
 @task
@@ -104,6 +124,19 @@ def build():
   This will ensure that a security group and key pair exist.
   It will also terminate any running instances tagged with `farmboy`.
   """
+  if not env.farmboy_os_image_id:
+    execute(images)
+    env.farmboy_os_image_id = util.load('farmboy_os_image_id')
+
+  if not env.farmboy_os_flavor_id:
+    execute(flavors)
+    env.farmboy_os_flavor_id = util.load('farmboy_os_flavor_id')
+
+  if env.farmboy_os_neutron and not env.farmboy_os_network_id:
+    execute(networks)
+    env.farmboy_os_network_id = util.load('farmboy_os_network_id')
+
+
   conn = client.Client(env.farmboy_os_username,
                        env.farmboy_os_password,
                        env.farmboy_os_tenant_name,
@@ -176,12 +209,17 @@ def build():
   util.puts('[os] Starting %d instances' % len(machines))
   # tag the instances with their roles
   for machine in machines:
-    inst = conn.servers.create(name='farmboy-%s' % machine,
-                               image=env.farmboy_os_image_id,
-                               flavor=env.farmboy_os_flavor_id,
-                               security_groups=security_groups,
-                               key_name=env.farmboy_os_keypair,
-                               meta={'farmboy': machine})
+    params = dict(name='farmboy-%s' % machine,
+                  image=env.farmboy_os_image_id,
+                  flavor=env.farmboy_os_flavor_id,
+                  security_groups=security_groups,
+                  key_name=env.farmboy_os_keypair,
+                  meta={'farmboy': machine})
+
+    if env.farmboy_os_neutron:
+      params['nics'] = [{'net-id': env.farmboy_os_network_id}]
+
+    inst = conn.servers.create(**params)
     util.puts('[os]  started server: %s -> %s' % (inst.id, machine))
 
   execute(refresh, expected=len(machines))
@@ -241,10 +279,65 @@ def images(filter=None):
 
 @task
 @util.requires('novaclient', 'novaclient')
+def flavors(filter=None):
+  """List the flavors available on the server."""
+  conn = client.Client(env.farmboy_os_username,
+                       env.farmboy_os_password,
+                       env.farmboy_os_tenant_name,
+                       env.farmboy_os_auth_url,
+                       service_type='compute')
+  flavors = conn.flavors.list()
+  for i, flavor in enumerate(flavors):
+    print '[%d] %s (%s)' % (i, flavor.name, flavor.id)
+
+  print
+  print 'Choose an flavor from above, or leave blank to skip.'
+  print '(It will be written to %s)' % DEFAULT_ROLEDEF_FILE
+  print
+  number = raw_input('>>> ')
+
+  if not number:
+    return
+
+  selected = flavors[int(number)]
+  o = {'farmboy_os_flavor_id': str(selected.id)}
+  util.update(o, DEFAULT_ROLEDEF_FILE)
+
+
+@task
+@util.requires('novaclient', 'novaclient')
+def networks(filter=None):
+  """List the networks available on the server."""
+  conn = client.Client(env.farmboy_os_username,
+                       env.farmboy_os_password,
+                       env.farmboy_os_tenant_name,
+                       env.farmboy_os_auth_url,
+                       service_type='compute')
+  networks = conn.networks.list()
+  for i, network in enumerate(networks):
+    print '[%d] %s (%s)' % (i, network.label, network.id)
+
+  print
+  print 'Choose an network from above, or leave blank to skip.'
+  print '(It will be written to %s)' % DEFAULT_ROLEDEF_FILE
+  print
+  number = raw_input('>>> ')
+
+  if not number:
+    return
+
+  selected = networks[int(number)]
+  o = {'farmboy_os_network_id': str(selected.id),
+       'farmboy_os_network_name': str(selected.label)}
+  util.update(o, DEFAULT_ROLEDEF_FILE)
+
+
+@task
+@util.requires('novaclient', 'novaclient')
 def refresh(expected=None):
   """Update local cache of IPs for OpenStack instances.
 
-  This will write a `farmboy.os.yaml` file of the running instances
+  This will write a `farmboy.yaml` file of the running instances
   on OpenStack tagged with `farmboy` and their associated roles.
   """
   conn = client.Client(env.farmboy_os_username,
@@ -252,6 +345,9 @@ def refresh(expected=None):
                        env.farmboy_os_tenant_name,
                        env.farmboy_os_auth_url,
                        service_type='compute')
+
+  if expected:
+    expected = int(expected)
 
   max_tries = 30
   for i in range(max_tries):
@@ -290,7 +386,9 @@ def refresh(expected=None):
   o = {'roledefs': {}}
   for inst in found_instances:
     role = str(inst.metadata['farmboy'])
-    ip_address = inst.addresses['private'][0]['addr']
+    import pprint
+    pprint.pprint(inst.addresses)
+    ip_address = inst.addresses[env.farmboy_os_network_name][0]['addr']
     util.puts('[os]   found: %s (%s)' % (ip_address, role))
     role_l = o['roledefs'].get(role, [])
     role_l.append(str('%s@%s' % (env.farmboy_os_image_user, ip_address)))

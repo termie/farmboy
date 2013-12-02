@@ -23,16 +23,16 @@ env.farmboy_aws_image_id = 'ami-1e0c902e' #us-west-2 raring amd64
 env.farmboy_aws_image_user = 'ubuntu'
 
 
-DEFAULT_ROLEDEF_FILE = 'farmboy.aws.yaml'
+DEFAULT_ROLEDEF_FILE = 'farmboy.yaml'
 DEFAULT_KEYFILE = 'farmboy.pem'
 DEFAULT_ROLEDEFS = """util.load_roledefs('%s')""" % DEFAULT_ROLEDEF_FILE
 DEFAULT_PREAMBLE = """
 
 # The AWS utilities can launch your VMs for you using `farmboy aws.build`.
 # This setting tells them how many and which roles to use, it will cache
-# their addresses by default into the farmboy.aws.yaml file so that we
+# their addresses by default into the farmboy.yaml file so that we
 # can target them for the rest of our actions.
-# POWER TIP: Use `farmboy aws.refresh` to update the farmboy.aws.yaml
+# POWER TIP: Use `farmboy aws.refresh` to update the farmboy.yaml
 #            file if you've manually changed your instances on EC2.
 env.farmboy_aws_instances = ['proxy', 'apt', 'web', 'web']
 
@@ -176,7 +176,7 @@ def terminate():
 def refresh(expected=None):
   """Update local cache of IPs for AWS instances.
 
-  This will write a `farmboy.aws.yaml` file of the running instances
+  This will write a `farmboy.yaml` file of the running instances
   on AWS tagged with `farmboy` and their associated roles.
   """
   conn = ec2.connect_to_region(env.farmboy_aws_region)
@@ -217,9 +217,4 @@ def refresh(expected=None):
     o['roledefs'][role] = role_l
 
   util.puts('[aws] Dumping roledefs to file: %s' % DEFAULT_ROLEDEF_FILE)
-  yaml.dump(o,
-            stream=open(DEFAULT_ROLEDEF_FILE, 'w'),
-            default_flow_style=False,
-            indent=2,
-            width=72)
-
+  util.update(o)

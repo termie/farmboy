@@ -2,7 +2,7 @@ from setuptools import setup
 
 config = dict(
     name='farmboy',
-    version='0.1.0',
+    version='0.1.1-dev',
     url='https://github.com/termie/farmboy',
     description='Rapid development environments.',
     author='Andy Smith',

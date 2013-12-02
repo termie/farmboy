@@ -52,7 +52,7 @@ if env.roledefs['apt']:
 # Let's load our MySQL password from our local yaml file, too.
 # If there isn't one in there, we'll auto-generate one during the
 # `mysql.deploy` step.
-env.farmboy_mysql_password = util.load('mysql_password')
+env.farmboy_mysql_password = util.load('farmboy_mysql_password')
 
 # Where our django app lives (this directory will be pushed to web servers).
 # This is expected to be the directory that contains the manage.py file for

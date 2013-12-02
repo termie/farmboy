@@ -27,7 +27,7 @@ def deploy():
     # If we don't have a key yet generate one and save it locally
     if not env.farmboy_mysql_password:
         new_password = _generate_password()
-        util.update({'mysql_password': new_password})
+        util.update({'farmboy_mysql_password': new_password})
         env.farmboy_mysql_password = new_password
 
     mysql_password = env.farmboy_mysql_password
@@ -39,11 +39,11 @@ def deploy():
 @task
 def create_user(name, password=None, host=None):
     if not password:
-        password = util.load('mysql_password_%s' % name)
+        password = util.load('farmboy_mysql_password_%s' % name)
 
     if not password:
         password = _generate_password()
-        util.update({'mysql_password_%s' % name: password})
+        util.update({'farmboy_mysql_password_%s' % name: password})
 
     with settings(mysql_user='root', mysql_password=env.farmboy_mysql_password):
         fabtools.require.mysql.user(name, password, host=host)
