@@ -65,7 +65,6 @@ def build_real_roles(roles):
       else:
         out_roles.add(role)
 
-  print list(out_roles)
   return list(out_roles)
 
 
