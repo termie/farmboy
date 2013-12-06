@@ -1,0 +1,14 @@
+CONFIG = {
+    # 'mode': 'wsgi',
+    'working_dir': '%(working_dir)s',
+    # 'environment': {
+    #   'PYTHONPATH': '/path/to/foo',
+    # },
+    # 'python': '/usr/bin/python',
+    'args': (
+        # '--bind=127.0.0.1:8000',
+        '--workers=4',
+        '--timeout=60',
+        '%(wsgi_app)s',
+    ),
+}

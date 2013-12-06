@@ -27,8 +27,12 @@ def files(s):
     path = pkg_resources.resource_filename(__name__, '_files/%s' % s)
     return path
 
-def home(s):
-    return os.path.join('/home/%s' % env.get('farmboy_user'), s)
+
+def home(s=None):
+    h = os.path.join('/home/%s' % env.get('farmboy_user'))
+    if s:
+        h = os.path.join(h, s)
+    return h
 
 
 def load_roledefs(path='farmboy.yaml'):

@@ -24,8 +24,9 @@ def deploy():
 #@roles('web')
 def restart():
     """Gunicorn doesn't act super swell, so look for a PID."""
-    if fabtools.files.is_file('/var/run/gunicorn/django.pid'):
-        sudo('service gunicorn restart', pty=False)
-    else:
-        #fabtools.service.start('gunicorn')
-        sudo('service gunicorn start', pty=False)
+    sudo('service gunicorn restart', pty=False)
+    #if fabtools.files.is_file('/var/run/gunicorn/django.pid'):
+    #    sudo('service gunicorn restart', pty=False)
+    #else:
+    #    #fabtools.service.start('gunicorn')
+    #    sudo('service gunicorn start', pty=False)

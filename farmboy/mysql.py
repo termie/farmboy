@@ -5,6 +5,7 @@ from fabric.api import env
 from fabric.api import parallel
 from fabric.api import roles
 from fabric.api import settings
+from fabric.api import sudo
 from farmboy.fabric_ import task
 
 from farmboy import util
@@ -33,11 +34,18 @@ def deploy():
     mysql_password = env.farmboy_mysql_password
 
     fabtools.require.mysql.server(password=mysql_password)
-
+    fabtools.require.files.file(
+            source = util.files('mysql/mysqld.cnf'),
+            path = '/etc/mysql/conf.d/mysqld.cnf',
+            owner = 'root',
+            group = 'root',
+            mode = '644',
+            use_sudo = True)
+    sudo('service mysql restart')
 
 @task
 @roles('db')
-def create_user(name, password=None, host=None):
+def create_user(name, password=None, user_host=None):
     if not password:
         password = util.load('farmboy_mysql_password_%s' % name)
 
@@ -46,7 +54,7 @@ def create_user(name, password=None, host=None):
         util.update({'farmboy_mysql_password_%s' % name: password})
 
     with settings(mysql_user='root', mysql_password=env.farmboy_mysql_password):
-        fabtools.require.mysql.user(name, password, host=host)
+        fabtools.require.mysql.user(name, password, host=user_host)
 
 
 @task
