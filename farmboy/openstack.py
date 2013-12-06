@@ -22,9 +22,11 @@ env.farmboy_os_auth_url = os.environ.get('OS_AUTH_URL', '')
 env.farmboy_os_image_id = None  # You'll want ubuntu 13.04
 env.farmboy_os_image_user = 'ubuntu'
 env.farmboy_os_flavor_id = None  # You probably want m1.small
-env.farmboy_os_neutron = True
+env.farmboy_os_use_neutron = False
 env.farmboy_os_network_id = None  # You probably want 'cloud'
 env.farmboy_os_network_name = 'private'  # 'private' unless using Neutron
+env.farmboy_os_use_floating_ips = False
+env.farmboy_os_floating_ip_pool = None
 env.farmboy_os_reservation_id = 'farmboy'
 env.farmboy_os_security_group = 'farmboy'
 env.farmboy_os_keypair = 'farmboy'
@@ -60,14 +62,19 @@ env.farmboy_os_flavor_id = util.load('farmboy_os_flavor_id', '%(default_yaml)s')
 env.farmboy_os_image_id = util.load('farmboy_os_image_id', '%(default_yaml)s')
 
 # If you are using an Openstack cloud that is using Neutron, you need to
-# to do some additional network config
-env.farmboy_os_neutron = True
-if env.farmboy_os_neutron:
+# to do some additional network config.
+# POWER TIP: Piccckkkeerrr: `farmboy openstack.networks`
+env.farmboy_os_use_neutron = False
+if env.farmboy_os_use_neutron:
   env.farmboy_os_network_id = util.load('farmboy_os_network_id',
                                         '%(default_yaml)s')
   env.farmboy_os_network_name = util.load('farmboy_os_network_name',
                                           '%(default_yaml)s')
 
+# If you want to use floating ips by default, you can set this to True
+# POWER TIP: This just calls `farmboy openstack.associate_floating_ips` after
+#            running the build task, you can call that yourself, too.
+env.farmboy_os_use_floating_ips = False
 
 # These are the various Openstack-related configuration options and their
 # default values. They should be pretty self explanatory for people who've
@@ -132,9 +139,10 @@ def build():
     execute(flavors)
     env.farmboy_os_flavor_id = util.load('farmboy_os_flavor_id')
 
-  if env.farmboy_os_neutron and not env.farmboy_os_network_id:
+  if env.farmboy_os_use_neutron and not env.farmboy_os_network_id:
     execute(networks)
     env.farmboy_os_network_id = util.load('farmboy_os_network_id')
+    env.farmboy_os_network_name = util.load('farmboy_os_network_name')
 
 
   conn = client.Client(env.farmboy_os_username,
@@ -216,13 +224,15 @@ def build():
                   key_name=env.farmboy_os_keypair,
                   meta={'farmboy': machine})
 
-    if env.farmboy_os_neutron:
+    if env.farmboy_os_use_neutron:
       params['nics'] = [{'net-id': env.farmboy_os_network_id}]
 
     inst = conn.servers.create(**params)
     util.puts('[os]  started server: %s -> %s' % (inst.id, machine))
 
   execute(refresh, expected=len(machines))
+  if env.farmboy_os_use_floating_ips:
+    execute(associate_floating_ips)
 
 
 @task
@@ -334,6 +344,34 @@ def networks(filter=None):
 
 @task
 @util.requires('novaclient', 'novaclient')
+def floating_ip_pools(filter=None):
+  """List the floating ip pools available on the server."""
+  conn = client.Client(env.farmboy_os_username,
+                       env.farmboy_os_password,
+                       env.farmboy_os_tenant_name,
+                       env.farmboy_os_auth_url,
+                       service_type='compute')
+
+  floating_ip_pools = conn.floating_ip_pools.list()
+  for i, pool in enumerate(floating_ip_pools):
+    print '[%d] %s (%s)' % (i, pool.name)
+
+  print
+  print 'Choose a floating ip pool from above, or leave blank to skip.'
+  print '(It will be written to %s)' % DEFAULT_ROLEDEF_FILE
+  print
+  number = raw_input('>>> ')
+
+  if not number:
+    return
+
+  selected = pool[int(number)]
+  o = {'farmboy_os_floating_ip_pool': str(selected.name)}
+  util.update(o, DEFAULT_ROLEDEF_FILE)
+
+
+@task
+@util.requires('novaclient', 'novaclient')
 def refresh(expected=None):
   """Update local cache of IPs for OpenStack instances.
 
@@ -386,8 +424,6 @@ def refresh(expected=None):
   o = {'roledefs': {}}
   for inst in found_instances:
     role = str(inst.metadata['farmboy'])
-    import pprint
-    pprint.pprint(inst.addresses)
     ip_address = inst.addresses[env.farmboy_os_network_name][0]['addr']
     util.puts('[os]   found: %s (%s)' % (ip_address, role))
     role_l = o['roledefs'].get(role, [])
@@ -397,3 +433,88 @@ def refresh(expected=None):
 
   util.puts('[os] Dumping roledefs to file: %s' % DEFAULT_ROLEDEF_FILE)
   util.update(o, DEFAULT_ROLEDEF_FILE)
+
+
+@task
+@util.requires('novaclient', 'novaclient')
+def associate_floating_ips():
+  """Ensure there are enough floating ips and associate them with instances."""
+  conn = client.Client(env.farmboy_os_username,
+                       env.farmboy_os_password,
+                       env.farmboy_os_tenant_name,
+                       env.farmboy_os_auth_url,
+                       service_type='compute')
+
+  util.puts('[os] Ensuring instances have floating ips associated.')
+
+  # Get our running instances
+  found_instances = []
+  running_instances = conn.servers.list()
+
+  for instance in running_instances:
+    if (instance.metadata.get('farmboy')
+        and instance.status == 'ACTIVE'
+        and getattr(instance, 'OS-EXT-STS:task_state') == None):
+      found_instances.append(instance)
+
+  instances_needing_ips = dict((inst.id, inst) for inst in found_instances)
+  available_ips = {}
+  instance_ips = {}
+
+  floating_ips = conn.floating_ips.list()
+
+  # figure out how many we need and how many we have available
+  for i, floating_ip in enumerate(floating_ips):
+    if floating_ip.instance_id in instances_needing_ips:
+      instances_needing_ips.pop(floating_ip.instance_id)
+      instance_ips[floating_ip.instance_id] = floating_ip.ip
+    elif not floating_ip.instance_id:
+      available_ips[floating_ip.id] = floating_ip
+
+  # do we need more?
+  needed_ips = len(instances_needing_ips) - len(available_ips)
+
+  # stupid floating ip pool tricks
+  if needed_ips > 0:
+    util.puts('[os] Creating %d more floating ips' % needed_ips)
+    if env.farmboy_os_floating_ip_pool:
+      pool = env.farmboy_os_floating_ip_pool
+    else:
+      # If we have more than one pool, launch _another_ picker
+      pools = conn.floating_ip_pools.list()
+      if len(pools) == 1:
+        pool = pools[0].name
+        env.farmboy_os_floating_ip_pool = pool
+        util.update({'farmboy_os_floating_ip_pool': str(pool)})
+      else:
+        execute(floating_ip_pools)
+        pool = util.load('farmboy_os_floating_ip_pool')
+
+    # make all the ips we need
+    for i in range(needed_ips):
+      m = conn.floating_ips.create(pool=pool)
+      util.puts('[os]   created: %s (%s)' % (m.ip, m.id))
+      available_ips = [m.id] = m
+
+  util.puts('[os] Associating floating IPs with instances.')
+  for inst_id, inst in instances_needing_ips.iteritems():
+    next_ip_id, next_ip = available_ips.popitem()
+    inst.add_floating_ip(next_ip.ip)
+    util.puts('[os]   associated: %s -> %s' % (next_ip.ip, inst.id))
+
+    instance_ips[inst_id] = next_ip.ip
+
+  # By now we should have IPs for everything, let's update the roledefs
+  o = {'roledefs': {}}
+  for inst in found_instances:
+    role = str(inst.metadata['farmboy'])
+    ip_address = instance_ips[inst.id]
+    util.puts('[os]   found: %s (%s)' % (ip_address, role))
+    role_l = o['roledefs'].get(role, [])
+    role_l.append(str('%s@%s' % (env.farmboy_os_image_user, ip_address)))
+
+    o['roledefs'][role] = role_l
+
+  util.puts('[os] Dumping roledefs to file: %s' % DEFAULT_ROLEDEF_FILE)
+  util.update(o, DEFAULT_ROLEDEF_FILE)
+
