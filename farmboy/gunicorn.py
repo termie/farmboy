@@ -10,6 +10,9 @@ from fabric.api import sudo
 from farmboy.fabric_ import task
 
 
+# http://thegunicorn.com/
+
+
 @task
 @roles('web')
 def deploy():
