@@ -111,7 +111,7 @@ def build_keypair():
 
 
 @task
-@util.requires('novaclient', 'novaclient')
+@util.requires('novaclient', 'python-novaclient')
 def init():
   """Locally set up basic files for using AWS."""
   fabfile_context = {'roledefs': DEFAULT_ROLEDEFS,
@@ -123,7 +123,7 @@ def init():
 
 
 @task
-@util.requires('novaclient', 'novaclient')
+@util.requires('novaclient', 'python-novaclient')
 def build():
   """Launch and prepare OpenStack instances to be used by Farm Boy.
 
@@ -236,7 +236,7 @@ def build():
 
 
 @task
-@util.requires('novaclient', 'novaclient')
+@util.requires('novaclient', 'python-novaclient')
 def terminate():
   """Terminate running OpenStack instances tagged with `farmboy`."""
   conn = client.Client(env.farmboy_os_username,
@@ -261,7 +261,7 @@ def terminate():
 
 
 @task
-@util.requires('novaclient', 'novaclient')
+@util.requires('novaclient', 'python-novaclient')
 def images(filter=None):
   """List the images available on the server."""
   conn = client.Client(env.farmboy_os_username,
@@ -288,7 +288,7 @@ def images(filter=None):
 
 
 @task
-@util.requires('novaclient', 'novaclient')
+@util.requires('novaclient', 'python-novaclient')
 def flavors(filter=None):
   """List the flavors available on the server."""
   conn = client.Client(env.farmboy_os_username,
@@ -315,7 +315,7 @@ def flavors(filter=None):
 
 
 @task
-@util.requires('novaclient', 'novaclient')
+@util.requires('novaclient', 'python-novaclient')
 def networks(filter=None):
   """List the networks available on the server."""
   conn = client.Client(env.farmboy_os_username,
@@ -343,7 +343,7 @@ def networks(filter=None):
 
 
 @task
-@util.requires('novaclient', 'novaclient')
+@util.requires('novaclient', 'python-novaclient')
 def floating_ip_pools(filter=None):
   """List the floating ip pools available on the server."""
   conn = client.Client(env.farmboy_os_username,
@@ -371,7 +371,7 @@ def floating_ip_pools(filter=None):
 
 
 @task
-@util.requires('novaclient', 'novaclient')
+@util.requires('novaclient', 'python-novaclient')
 def refresh(expected=None):
   """Update local cache of IPs for OpenStack instances.
 
@@ -436,7 +436,7 @@ def refresh(expected=None):
 
 
 @task
-@util.requires('novaclient', 'novaclient')
+@util.requires('novaclient', 'python-novaclient')
 def associate_floating_ips():
   """Ensure there are enough floating ips and associate them with instances."""
   conn = client.Client(env.farmboy_os_username,
