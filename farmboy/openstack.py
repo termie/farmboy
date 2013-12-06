@@ -43,7 +43,7 @@ DEFAULT_PREAMBLE = """
 # file so that we can target them for the rest of our actions.
 # POWER TIP: Use `farmboy openstack.refresh` to update the farmboy.yaml
 #            file if you've manually changed your instances.
-env.farmboy_os_instances = ['proxy', 'apt', 'web', 'web']
+env.farmboy_os_instances = ['proxy', 'apt', 'db', 'web', 'web']
 
 # We generally want to use a stock Ubuntu 13.04 cloud image, you'll need
 # to figure out the ID of one (or upload it using the dashboard).

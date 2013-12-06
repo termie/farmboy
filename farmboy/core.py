@@ -16,6 +16,7 @@ def _set_env_defaults():
     env.setdefault('farmboy_user', DEFAULT_USER)
     env.setdefault('farmboy_files', './files')
     env.skip_bad_hosts = True
+    env.disable_known_hosts = True
     env.timeout = 2
     env.roledefs = {}
 
