@@ -7,11 +7,11 @@ from fabric.api import execute
 from fabric.api import parallel
 from fabric.api import roles
 from fabric.api import sudo
-from fabric.api import task
+from farmboy.fabric_ import task
 
 
-@roles('web')
 @task
+@roles('web')
 def deploy():
     """Add gunicorn to the <web> hosts."""
     fabtools.require.deb.packages([
@@ -20,8 +20,8 @@ def deploy():
     restart()
 
 
-#@roles('web')
 #@task
+#@roles('web')
 def restart():
     """Gunicorn doesn't act super swell, so look for a PID."""
     if fabtools.files.is_file('/var/run/gunicorn/django.pid'):

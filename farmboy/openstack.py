@@ -12,7 +12,7 @@ from farmboy import util
 from fabric.api import env
 from fabric.api import execute
 from fabric.api import local
-from fabric.api import task
+from farmboy.fabric_ import task
 
 env.farmboy_os_username = os.environ.get('OS_USERNAME', '')
 env.farmboy_os_password = os.environ.get('OS_PASSWORD', '')
@@ -34,7 +34,6 @@ env.farmboy_os_keyfile = 'farmboy.key'
 env.farmboy_os_keyfile_public = 'farmboy.key.pub'
 
 DEFAULT_ROLEDEF_FILE = 'farmboy.yaml'
-DEFAULT_KEYFILE = 'farmboy.pem'
 DEFAULT_ROLEDEFS = """util.load_roledefs('%s')""" % DEFAULT_ROLEDEF_FILE
 DEFAULT_PREAMBLE = """
 
@@ -90,7 +89,7 @@ env.farmboy_os_use_floating_ips = False
 # env.farmboy_os_security_group = 'farmboy'
 # env.farmboy_os_keypair = 'farmboy'
 # env.farmboy_os_keyfile = 'farmboy.key'
-# env.farmboy_os_keyfile_public = 'farmboy.pub'
+# env.farmboy_os_keyfile_public = 'farmboy.key.pub'
 
 
 # We're using `python-novaclient` for the built-in OpenStack tools, so if you
@@ -116,7 +115,7 @@ def build_keypair():
 def init():
   """Locally set up basic files for using AWS."""
   fabfile_context = {'roledefs': DEFAULT_ROLEDEFS,
-                     'keyfile': repr('%s.pem' % env.farmboy_aws_key_pair),
+                     'keyfile': repr(env.farmboy_os_keyfile),
                      'preamble': DEFAULT_PREAMBLE}
   util.template_file('farmboy/fabfile.py.template',
                      'fabfile.py',
@@ -212,6 +211,7 @@ def build():
   execute(terminate)
 
   machines = env.farmboy_os_instances
+
 
   # launch instances with in security group, with keypair
   util.puts('[os] Starting %d instances' % len(machines))

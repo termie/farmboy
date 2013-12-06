@@ -14,12 +14,12 @@ from fabric.api import local
 from fabric.api import roles
 from fabric.api import run
 from fabric.api import sudo
-from fabric.api import task
 from fabric.context_managers import cd
+from farmboy.fabric_ import task
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def depends():
     """Update dependencies for GitLab on the <vcs> host."""
     fabtools.deb.update_index(quiet=False)
@@ -51,8 +51,8 @@ def depends():
     ])
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def ruby(force=False):
     # The AWS version of Ubuntu 13.04 doesn't ship with ruby, but the vagrant
     # version does...
@@ -78,22 +78,22 @@ def ruby(force=False):
             sudo('make install')
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def bundler():
     sudo('gem install bundler')
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def git_user():
     # do this manually, rather than via fabtools
     if not fabtools.user.exists('git'):
         sudo("adduser --disabled-login --gecos 'GitLab' git")
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def gitlab_shell():
     if not fabtools.files.is_dir('/home/git/gitlab-shell'):
         with cd('/home/git'):
@@ -114,8 +114,8 @@ def gitlab_shell():
         sudo('./bin/install', user='git')
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def database_postgres():
     fabtools.require.deb.packages([
         'postgresql-9.1',
@@ -147,8 +147,8 @@ def database_postgres():
     sudo('psql -d template1 -f /tmp/commands', user='postgres')
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def clone_source():
     if not fabtools.files.is_dir('/home/git/gitlab'):
         with cd('/home/git'):
@@ -159,8 +159,8 @@ def clone_source():
         sudo('git checkout 5-3-stable', user='git')
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def configure():
     with cd('/home/git/gitlab'):
         fabtools.require.files.file(
@@ -216,8 +216,8 @@ def configure():
         use_sudo = True)
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def configure_gitlab_db_postgres():
     # this makes sense to be in the database_postgres area, but the install
     # docs have it here, keeping it here to prevent confusion
@@ -230,8 +230,8 @@ def configure_gitlab_db_postgres():
         use_sudo = True)
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def install_gems_postgres():
     with cd('/home/git/gitlab'):
         sudo("gem install -V charlock_holmes --version '0.6.9.4'")
@@ -239,16 +239,16 @@ def install_gems_postgres():
              user='git')
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def init_database():
     with cd('/home/git/gitlab'):
         sudo('force=yes bundle exec rake gitlab:setup RAILS_ENV=production',
              user='git')
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def init_script():
     with cd('/home/git/gitlab'):
         sudo('cp lib/support/init.d/gitlab /etc/init.d/gitlab')
@@ -257,44 +257,44 @@ def init_script():
     sudo('update-rc.d gitlab defaults 21')
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def start_gitlab():
     sudo('service gitlab start')
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def stop_gitlab():
     sudo('service gitlab stop')
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def check_info():
     with cd('/home/git/gitlab'):
         sudo('bundle exec rake gitlab:env:info RAILS_ENV=production',
              user='git')
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def check_status():
     with cd('/home/git/gitlab'):
         sudo('bundle exec rake gitlab:check RAILS_ENV=production',
              user='git')
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def sidekiq():
     with cd('/home/git/gitlab'):
         sudo('bundle exec rake sidekiq:start RAILS_ENV=production',
              user='git')
 
 
-@roles('vcs')
 @task
+@roles('vcs')
 def site_configuration():
     fabtools.require.file(
         source   = 'files/nginx/gitlab',
@@ -309,8 +309,8 @@ def site_configuration():
     sudo('service nginx restart')
 
 
-@roles('vcs')
 @task(default=True)
+@roles('vcs')
 def deploy():
     """Deploy a full GitLab instance to the <vcs> host.
 

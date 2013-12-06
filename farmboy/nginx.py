@@ -7,11 +7,11 @@ from farmboy import util
 
 from fabric.api import parallel
 from fabric.api import roles
-from fabric.api import task
+from farmboy.fabric_ import task
 
 
-@roles('web')
 @task
+@roles('web')
 @parallel
 def deploy():
     """Add nginx to the the <web> hosts."""

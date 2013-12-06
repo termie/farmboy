@@ -6,7 +6,7 @@ import pkg_resources
 from fabric.api import env
 from fabric.api import local
 from fabric.api import puts
-from fabric.api import task
+from farmboy.fabric_ import task
 
 
 def _makedir(p):
@@ -16,7 +16,6 @@ def _makedir(p):
   except OSError as exc:
       if exc.errno == errno.EEXIST and os.path.isdir(p):
           pass
-
 
 
 @task

@@ -13,7 +13,7 @@ from farmboy import util
 
 from fabric.api import env
 from fabric.api import execute
-from fabric.api import task
+from farmboy.fabric_ import task
 
 
 env.farmboy_aws_region = 'us-west-2'

@@ -6,7 +6,7 @@ from farmboy import util
 
 from fabric.api import env
 from fabric.api import local
-from fabric.api import task
+from farmboy.fabric_ import task
 
 
 DEFAULT_ROLEDEFS = {

@@ -13,13 +13,13 @@ from fabric.api import parallel
 from fabric.api import put
 from fabric.api import roles
 from fabric.api import sudo
-from fabric.api import task
+from farmboy.fabric_ import task
 
 from farmboy import gunicorn
 
 
-@roles('web')
 @task
+@roles('web')
 @parallel
 def deploy(path=None, use_gunicorn=True):
     """Put a django site onto the web servers."""

@@ -21,7 +21,7 @@ import struct
 import threading
 
 from fabric.api import env
-from fabric.api import task
+from farmboy.fabric_ import task
 
 env.farmboy_socks_proxy = os.environ.get('SOCKS_PROXY', 'localhost:1080')
 

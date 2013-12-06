@@ -3,7 +3,7 @@
 from fabric.api import env
 from fabric.api import parallel
 from fabric.api import roles
-from fabric.api import task
+from farmboy.fabric_ import task
 
 import fabtools.deb
 import fabtools.require
@@ -17,14 +17,14 @@ def _set_env_defaults():
     env.setdefault('farmboy_files', './files')
     env.skip_bad_hosts = True
     env.timeout = 2
-    env.roledefs = {'apt': [], 'ci': [], 'proxy': [], 'vcs': [], 'web': []}
+    env.roledefs = {}
 
 
 _set_env_defaults()
 
 
-@roles('proxy', 'web', 'db', 'ci', 'vcs', 'apt')
 @task
+@roles('all')
 @parallel
 def install_user(user=DEFAULT_USER):
     """Ensure our default user has been created on all hosts."""

@@ -6,14 +6,14 @@ from farmboy import util
 
 from fabric.api import env
 from fabric.api import roles
-from fabric.api import task
+from farmboy.fabric_ import task
 
 
 WEB_SERVER = '  server web%(i)s %(host)s:%(port)s maxconn 32'
 
 
-@roles('proxy')
 @task
+@roles('proxy')
 def deploy():
     """Add HAproxy to the <proxy> host."""
     fabtools.require.deb.packages([

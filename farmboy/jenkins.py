@@ -11,11 +11,11 @@ from fabric.api import local
 from fabric.api import sudo
 from fabric.api import roles
 from fabric.api import run
-from fabric.api import task
+from farmboy.fabric_ import task
 
 
-@roles('ci')
 @task
+@roles('ci')
 def jenkins_repo():
     fabtools.require.files.file(
         url = 'http://pkg.jenkins-ci.org/debian/jenkins-ci.org.key',
@@ -27,22 +27,22 @@ def jenkins_repo():
         use_sudo=True)
 
 
-@roles('ci')
 @task
+@roles('ci')
 def depends():
     fabtools.deb.update_index(quiet=False)
 
 
-@roles('ci')
 @task
+@roles('ci')
 def jenkins():
     fabtools.require.deb.packages([
         'jenkins',
     ])
 
 
-@roles('ci')
 @task
+@roles('ci')
 def nginx():
     fabtools.require.deb.packages([
         'nginx',
@@ -66,8 +66,8 @@ def setup_ssh_keys():
     sudo('cat /var/lib/jenkins/.ssh/id_rsa.pub')
 
 
-@roles('ci')
 @task
+@roles('ci')
 def deploy():
     """Deploy a Jenkins server to the <ci> host."""
     #setup_machine()
@@ -83,8 +83,8 @@ def deploy():
     execute(nginx)
 
 
-@roles('ci')
 @task
+@roles('ci')
 def test_clone_repo(repourl=''):
     if not repourl:
         print 'Specify a repository url'

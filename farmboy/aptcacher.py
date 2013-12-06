@@ -9,7 +9,7 @@ from farmboy import util
 from fabric.api import env
 from fabric.api import parallel
 from fabric.api import roles
-from fabric.api import task
+from farmboy.fabric_ import task
 
 
 
@@ -20,8 +20,8 @@ def _set_env_defaults():
 _set_env_defaults()
 
 
-@roles('apt')
 @task
+@roles('apt')
 def deploy():
     """Deploy apt-cacher to the <apt> host."""
     fabtools.require.deb.packages([
@@ -47,8 +47,8 @@ def deploy():
     fabtools.require.service.restarted('apt-cacher')
 
 
-@roles('db', 'ci', 'proxy', 'vcs', 'web')
 @task
+@roles('db', 'ci', 'proxy', 'vcs', 'web')
 @parallel
 def set_proxy(proxy=None):
     """Set the <apt> host as the proxy for apt on <all> hosts."""
