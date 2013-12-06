@@ -45,7 +45,7 @@ env.roledefs.update(%(roledefs)s)
 # Since we're be using apt caching, point out where that proxy will live.
 # POWER TIP: If you're already using such a proxy, you can just point this
 #            at that server and skip the `execute(aptcacher.deploy)` step.
-if env.roledefs['apt']:
+if env.roledefs.get('apt'):
     apt = env.roledefs['apt'][0]
     env.farmboy_apt_proxy = 'http://%%s:3142' %% util.host(apt)
 
@@ -76,7 +76,7 @@ env.farmboy_files = './files'
 def demo():
     """Example deployment of an haproxy+nginx+gunicorn+django."""
     execute(dns.hosts)
-    if env.roledefs['apt']:
+    if env.roledefs.get('apt'):
         execute(aptcacher.deploy)
         execute(aptcacher.set_proxy)
     execute(core.install_user)
