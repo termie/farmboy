@@ -40,3 +40,9 @@ build:
   #       channel: farmboy
   #       on: failed
   #       failed-message: "termie: your fucking build failed for farmboy: https://app.wercker.com/#applications/528c060a9baffb3860004908/tab/builds"
+  #
+deploy:
+    steps:
+        - script:
+            name: haha
+            code: echo "deploy finished!"
